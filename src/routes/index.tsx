@@ -10,6 +10,10 @@ import {
   BadgeCheck,
   Smartphone,
   ChevronUp,
+  MessageCircle,
+  DollarSign,
+  Bookmark,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -123,6 +127,56 @@ function ProfilePage() {
           )}
         </section>
 
+        {/* Locked post preview */}
+        <section className="px-3 mt-6">
+          <article className="rounded-2xl bg-surface overflow-hidden border border-border">
+            {/* Post header */}
+            <div className="flex items-center justify-between px-3 py-3">
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-full bg-surface-2 grid place-items-center text-base">
+                  👤
+                </div>
+                <div className="leading-tight">
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-semibold">usuario_demo</span>
+                    <BadgeCheck className="h-4 w-4 text-[oklch(0.7_0.15_220)] fill-[oklch(0.7_0.15_220)] text-background" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">@usuario_demo</span>
+                </div>
+              </div>
+              <button className="h-8 w-8 grid place-items-center">
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Locked media */}
+            <div className="relative mx-3 mb-3 aspect-square rounded-2xl bg-[oklch(0.93_0.015_85)] grid place-items-center overflow-hidden">
+              <Lock className="h-12 w-12 text-[oklch(0.55_0.04_260)]" strokeWidth={2.25} />
+              <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-4 text-[oklch(0.4_0.03_260)] text-sm font-medium">
+                <span className="flex items-center gap-1">
+                  <ImageIcon className="h-4 w-4" /> 59
+                </span>
+                <span className="flex items-center gap-1">
+                  <Film className="h-4 w-4" /> 26
+                </span>
+                <span className="flex items-center gap-1">
+                  <Heart className="h-4 w-4" /> 2.6K
+                </span>
+              </div>
+            </div>
+
+            {/* Post actions */}
+            <div className="flex items-center justify-between px-4 pb-4">
+              <div className="flex items-center gap-4 text-foreground">
+                <Heart className="h-5 w-5" />
+                <MessageCircle className="h-5 w-5" />
+                <DollarSign className="h-5 w-5" />
+              </div>
+              <Bookmark className="h-5 w-5" />
+            </div>
+          </article>
+        </section>
+
         {/* Bottom tabs */}
         <nav className="fixed bottom-0 left-0 right-0 flex justify-center pointer-events-none">
           <div className="pointer-events-auto w-full max-w-[420px] bg-background border-t border-border">
@@ -131,13 +185,13 @@ function ProfilePage() {
                 active={tab === "posts"}
                 onClick={() => setTab("posts")}
                 icon={<Smartphone className="h-5 w-5" />}
-                label="00 Postagens"
+                label="55 Postagens"
               />
               <TabButton
                 active={tab === "media"}
                 onClick={() => setTab("media")}
                 icon={<Film className="h-5 w-5" />}
-                label="00 Mídias"
+                label="105 Mídias"
               />
             </div>
             <div className="relative h-0.5 bg-transparent">
