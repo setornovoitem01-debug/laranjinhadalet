@@ -125,103 +125,142 @@ function ProfilePage() {
           </p>
         </div>
 
-        {/* Subscriptions */}
-        <section className="px-4 mt-6">
-          <h3 className="text-base font-semibold mb-3">Assinaturas</h3>
-          <PlanButton label="1 mês" price="R$ 15,99" onClick={() => openAuth("1 mês", "R$ 15,99")} />
-        </section>
+        {checkoutMode ? (
+          <>
+            {/* Benefícios exclusivos */}
+            <section className="px-4 mt-6">
+              <h3 className="text-base font-semibold mb-3">Benefícios exclusivos</h3>
+              <ul className="space-y-2.5 text-sm">
+                <BenefitItem text="Acesso ao conteúdo" />
+                <BenefitItem text="Chat exclusivo com o criador" />
+                <BenefitItem text="Cancele a qualquer hora" />
+              </ul>
+            </section>
 
-        {/* Promotions */}
-        <section className="px-4 mt-5">
-          <button
-            onClick={() => setPromosOpen((v) => !v)}
-            className="w-full flex items-center justify-between mb-3"
-          >
-            <h3 className="text-base font-semibold">Promoções</h3>
-            <ChevronUp
-              className={`h-5 w-5 transition-transform ${promosOpen ? "" : "rotate-180"}`}
-            />
-          </button>
-          {promosOpen && (
-            <div className="space-y-3">
-              <PlanButton label="3 meses" price="R$ 21,90" onClick={() => openAuth("3 meses", "R$ 21,90")} />
-              <PlanButton label="Vitalício" price="R$ 35,80" onClick={() => openAuth("Vitalício", "R$ 35,80")} />
+            <div className="px-4 mt-6">
+              <div className="border-t border-border" />
             </div>
-          )}
-        </section>
 
-        {/* Tabs */}
-        <nav className="mt-8 border-t border-border">
-          <div className="grid grid-cols-2">
-            <TabButton
-              active={tab === "posts"}
-              onClick={() => setTab("posts")}
-              icon={<Smartphone className="h-5 w-5" />}
-              label="55 Postagens"
-            />
-            <TabButton
-              active={tab === "media"}
-              onClick={() => setTab("media")}
-              icon={<Film className="h-5 w-5" />}
-              label="105 Mídias"
-            />
-          </div>
-          <div className="relative h-0.5 bg-transparent">
-            <div
-              className={`absolute top-0 h-0.5 w-1/2 bg-[oklch(0.78_0.17_45)] transition-transform ${
-                tab === "media" ? "translate-x-full" : ""
-              }`}
-            />
-          </div>
-        </nav>
+            {/* Formas de pagamento */}
+            <section className="px-4 mt-5">
+              <h3 className="text-base font-semibold mb-1">Formas de pagamento</h3>
+              <p className="text-xs text-muted-foreground">Valor</p>
+              <p className="text-2xl font-semibold mt-1 mb-4">{selectedPlan.price}</p>
 
-        {/* Locked post preview */}
-        <section className="px-3 mt-4">
-          <article className="rounded-2xl bg-surface overflow-hidden border border-border">
-            <div className="flex items-center justify-between px-3 py-3">
-              <div className="flex items-center gap-2">
-                <div className="h-10 w-10 rounded-full bg-surface-2 overflow-hidden">
-                  <img src={PROFILE_IMG} alt={DISPLAY_NAME} className="h-full w-full object-cover" />
-                </div>
-                <div className="leading-tight">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm font-semibold">{DISPLAY_NAME}</span>
-                    <BadgeCheck className="h-4 w-4 text-[oklch(0.7_0.15_220)] fill-[oklch(0.7_0.15_220)] text-background" />
-                  </div>
-                  <span className="text-xs text-muted-foreground">@{HANDLE}</span>
-                </div>
+              <div className="rounded-full border border-border bg-surface px-4 py-3 mb-4 overflow-hidden">
+                <p className="text-xs text-muted-foreground truncate font-mono">
+                  00020101021226640014br.gov.bcb.pix2542pix.m…
+                </p>
               </div>
-              <button className="h-8 w-8 grid place-items-center">
-                <MoreVertical className="h-4 w-4" />
+
+              <button className="gradient-orange w-full rounded-full h-12 text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)] flex items-center justify-center gap-2">
+                <Copy className="h-4 w-4" />
+                Copiar chave Pix
               </button>
-            </div>
+            </section>
+          </>
+        ) : (
+          <>
+            {/* Subscriptions */}
+            <section className="px-4 mt-6">
+              <h3 className="text-base font-semibold mb-3">Assinaturas</h3>
+              <PlanButton label="1 mês" price="R$ 15,99" onClick={() => openAuth("1 mês", "R$ 15,99")} />
+            </section>
 
-            <div className="relative mx-3 mb-3 aspect-square rounded-2xl bg-[oklch(0.93_0.015_85)] grid place-items-center overflow-hidden">
-              <Lock className="h-12 w-12 text-[oklch(0.55_0.04_260)]" strokeWidth={2.25} />
-              <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-4 text-[oklch(0.4_0.03_260)] text-sm font-medium">
-                <span className="flex items-center gap-1">
-                  <ImageIcon className="h-4 w-4" /> 59
-                </span>
-                <span className="flex items-center gap-1">
-                  <Film className="h-4 w-4" /> 26
-                </span>
-                <span className="flex items-center gap-1">
-                  <Heart className="h-4 w-4" /> 2.6K
-                </span>
-              </div>
-            </div>
+            {/* Promotions */}
+            <section className="px-4 mt-5">
+              <button
+                onClick={() => setPromosOpen((v) => !v)}
+                className="w-full flex items-center justify-between mb-3"
+              >
+                <h3 className="text-base font-semibold">Promoções</h3>
+                <ChevronUp
+                  className={`h-5 w-5 transition-transform ${promosOpen ? "" : "rotate-180"}`}
+                />
+              </button>
+              {promosOpen && (
+                <div className="space-y-3">
+                  <PlanButton label="3 meses" price="R$ 21,90" onClick={() => openAuth("3 meses", "R$ 21,90")} />
+                  <PlanButton label="Vitalício" price="R$ 35,80" onClick={() => openAuth("Vitalício", "R$ 35,80")} />
+                </div>
+              )}
+            </section>
 
-            <div className="flex items-center justify-between px-4 pb-4">
-              <div className="flex items-center gap-4 text-foreground">
-                <Heart className="h-5 w-5" />
-                <MessageCircle className="h-5 w-5" />
-                <DollarSign className="h-5 w-5" />
+            {/* Tabs */}
+            <nav className="mt-8 border-t border-border">
+              <div className="grid grid-cols-2">
+                <TabButton
+                  active={tab === "posts"}
+                  onClick={() => setTab("posts")}
+                  icon={<Smartphone className="h-5 w-5" />}
+                  label="55 Postagens"
+                />
+                <TabButton
+                  active={tab === "media"}
+                  onClick={() => setTab("media")}
+                  icon={<Film className="h-5 w-5" />}
+                  label="105 Mídias"
+                />
               </div>
-              <Bookmark className="h-5 w-5" />
-            </div>
-          </article>
-        </section>
+              <div className="relative h-0.5 bg-transparent">
+                <div
+                  className={`absolute top-0 h-0.5 w-1/2 bg-[oklch(0.78_0.17_45)] transition-transform ${
+                    tab === "media" ? "translate-x-full" : ""
+                  }`}
+                />
+              </div>
+            </nav>
+
+            {/* Locked post preview */}
+            <section className="px-3 mt-4">
+              <article className="rounded-2xl bg-surface overflow-hidden border border-border">
+                <div className="flex items-center justify-between px-3 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-full bg-surface-2 overflow-hidden">
+                      <img src={PROFILE_IMG} alt={DISPLAY_NAME} className="h-full w-full object-cover" />
+                    </div>
+                    <div className="leading-tight">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-semibold">{DISPLAY_NAME}</span>
+                        <BadgeCheck className="h-4 w-4 text-[oklch(0.7_0.15_220)] fill-[oklch(0.7_0.15_220)] text-background" />
+                      </div>
+                      <span className="text-xs text-muted-foreground">@{HANDLE}</span>
+                    </div>
+                  </div>
+                  <button className="h-8 w-8 grid place-items-center">
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="relative mx-3 mb-3 aspect-square rounded-2xl bg-[oklch(0.93_0.015_85)] grid place-items-center overflow-hidden">
+                  <Lock className="h-12 w-12 text-[oklch(0.55_0.04_260)]" strokeWidth={2.25} />
+                  <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-4 text-[oklch(0.4_0.03_260)] text-sm font-medium">
+                    <span className="flex items-center gap-1">
+                      <ImageIcon className="h-4 w-4" /> 59
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Film className="h-4 w-4" /> 26
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Heart className="h-4 w-4" /> 2.6K
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between px-4 pb-4">
+                  <div className="flex items-center gap-4 text-foreground">
+                    <Heart className="h-5 w-5" />
+                    <MessageCircle className="h-5 w-5" />
+                    <DollarSign className="h-5 w-5" />
+                  </div>
+                  <Bookmark className="h-5 w-5" />
+                </div>
+              </article>
+            </section>
+          </>
+        )}
       </div>
+
 
       <Dialog open={authOpen} onOpenChange={setAuthOpen}>
         <DialogContent className="max-w-[360px] rounded-2xl p-6 bg-[oklch(0.985_0.005_60)] border-0">
