@@ -29,6 +29,28 @@ type CreatePixResult = {
   error?: string;
 };
 
+type YuvexPayErrorBody = {
+  error?: string | { code?: string; message?: string; details?: unknown };
+  message?: string;
+  code?: string;
+};
+
+const getYuvexPayErrorMessage = (status: number, json: YuvexPayErrorBody | null) => {
+  const nested = typeof json?.error === "object" ? json.error : null;
+  const directError = typeof json?.error === "string" ? json.error : undefined;
+  const code = nested?.code || json?.code;
+  const message = nested?.message || json?.message || directError;
+
+  if (code === "PAYMENT_CREATION_BLOCKED") {
+    return "A conta YuvexPay ainda não está liberada para criar Pix em produção.";
+  }
+  if (code === "FORBIDDEN" || code === "IP_NOT_ALLOWED") {
+    return "A chave YuvexPay foi recusada por permissão, escopo ou liberação de IP.";
+  }
+
+  return message || `Falha ao criar Pix (${status})`;
+};
+
 export const createPixPayment = createServerFn({ method: "POST" })
   .inputValidator((input: CreatePixInput) => {
     if (!input || typeof input.amount !== "number" || input.amount <= 0) {
@@ -74,7 +96,7 @@ export const createPixPayment = createServerFn({ method: "POST" })
       const res = await fetch("https://api.yuvexpay.com/v1/payments", {
         method: "POST",
         headers: {
-          Authorization: `Basic ${btoa(`${apiKey}:x`)}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
           "X-Idempotency-Key": idempotencyKey,
         },
@@ -82,15 +104,13 @@ export const createPixPayment = createServerFn({ method: "POST" })
       });
 
       const rawText = await res.text();
-      let json: {
+      let json: ({
         payment?: {
           id?: string;
           expiresAt?: string;
           methodData?: { pixCopyPaste?: string; qrCodeBase64?: string };
         };
-        message?: string;
-        error?: string;
-      } | null = null;
+      } & YuvexPayErrorBody) | null = null;
       try {
         json = rawText ? JSON.parse(rawText) : null;
       } catch {
@@ -101,7 +121,7 @@ export const createPixPayment = createServerFn({ method: "POST" })
         console.error("YuvexPay error", res.status, "body:", rawText?.slice(0, 500));
         return {
           ok: false,
-          error: json?.message || json?.error || `Falha ao criar Pix (${res.status})`,
+          error: getYuvexPayErrorMessage(res.status, json),
         };
       }
 
