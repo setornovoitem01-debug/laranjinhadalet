@@ -21,7 +21,7 @@ import {
   Check,
   Copy,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import profileAsset from "@/assets/profile.png.asset.json";
