@@ -42,6 +42,8 @@ export const Route = createFileRoute("/")({
 function ProfilePage() {
   const [promosOpen, setPromosOpen] = useState(true);
   const [tab, setTab] = useState<"posts" | "media">("posts");
+  const [authOpen, setAuthOpen] = useState(false);
+  const openAuth = () => setAuthOpen(true);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex justify-center">
