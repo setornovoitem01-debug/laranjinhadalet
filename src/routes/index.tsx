@@ -139,8 +139,8 @@ function ProfilePage() {
           </button>
           {promosOpen && (
             <div className="space-y-3">
-              <PlanButton label="3 meses" price="R$ 21,90" onClick={openAuth} />
-              <PlanButton label="Vitalício" price="R$ 35,80" onClick={openAuth} />
+              <PlanButton label="3 meses" price="R$ 21,90" onClick={() => openAuth("3 meses", "R$ 21,90")} />
+              <PlanButton label="Vitalício" price="R$ 35,80" onClick={() => openAuth("Vitalício", "R$ 35,80")} />
             </div>
           )}
         </section>
