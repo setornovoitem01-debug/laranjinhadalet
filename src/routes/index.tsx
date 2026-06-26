@@ -505,6 +505,73 @@ function ProfilePage() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={backOfferOpen} onOpenChange={setBackOfferOpen}>
+        <DialogContent className="max-w-[360px] rounded-2xl p-6 bg-[oklch(0.985_0.005_60)] border-0">
+          <DialogHeader>
+            <DialogTitle className="text-left text-xl">Espera! Oferta exclusiva 🔥</DialogTitle>
+          </DialogHeader>
+
+          <div className="rounded-xl bg-[oklch(0.96_0.04_45)] text-[oklch(0.45_0.15_35)] px-3 py-2 text-center text-xs font-semibold">
+            ⏱ Você tem {formatTime(offerSecondsLeft)} para aceitar
+          </div>
+
+          <p className="text-sm text-foreground mt-2">
+            Só agora, leve o <b>acesso vitalício</b> ao meu conteúdo + <b>uma chamada de vídeo de 10 minutos</b> comigo por apenas:
+          </p>
+          <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-3xl font-bold text-foreground">{OFFER_PRICE_LABEL}</span>
+            <span className="text-xs text-muted-foreground line-through">de R$ 35,80</span>
+          </div>
+
+          {offerPixCode ? (
+            <>
+              <div className="rounded-2xl border border-border bg-surface px-4 py-3 mt-3 overflow-hidden">
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Pix Copia e Cola</p>
+                <p className="text-xs text-foreground font-mono break-all line-clamp-3">{offerPixCode}</p>
+              </div>
+              <button
+                onClick={copyOfferPix}
+                className="gradient-orange w-full rounded-full h-12 mt-3 text-brand-foreground font-medium flex items-center justify-center gap-2"
+              >
+                {offerCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {offerCopied ? "Copiado!" : "Copiar chave Pix"}
+              </button>
+              <p className="text-[11px] text-muted-foreground text-center mt-2">
+                Cole no app do seu banco em Pix Copia e Cola e finalize.
+              </p>
+            </>
+          ) : (
+            <>
+              {offerPixError && (
+                <p className="text-xs text-destructive mt-2">{offerPixError}</p>
+              )}
+              <div className="flex flex-col gap-2 mt-4">
+                <button
+                  onClick={acceptOffer}
+                  disabled={offerPixLoading || offerSecondsLeft <= 0}
+                  className="gradient-orange w-full rounded-full h-12 text-brand-foreground font-medium disabled:opacity-50"
+                >
+                  {offerPixLoading
+                    ? "Gerando Pix…"
+                    : offerSecondsLeft <= 0
+                      ? "Oferta expirada"
+                      : `Aceitar oferta por ${OFFER_PRICE_LABEL}`}
+                </button>
+                <button
+                  onClick={() => {
+                    setBackOfferOpen(false);
+                    exitCheckout();
+                  }}
+                  className="w-full h-10 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Não, recusar e sair
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
