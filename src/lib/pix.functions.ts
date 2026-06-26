@@ -98,6 +98,9 @@ export const createPixPayment = createServerFn({ method: "POST" })
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
+          Accept: "application/json",
+          "User-Agent": "LaranjinhaDaLet/1.0 (+https://laranjinhadalet.lovable.app)",
+          "Idempotency-Key": idempotencyKey,
           "X-Idempotency-Key": idempotencyKey,
         },
         body: JSON.stringify(body),
