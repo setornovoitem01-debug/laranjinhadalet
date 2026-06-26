@@ -117,7 +117,7 @@ function ProfilePage() {
         {/* Subscriptions */}
         <section className="px-4 mt-6">
           <h3 className="text-base font-semibold mb-3">Assinaturas</h3>
-          <PlanButton label="1 mês" price="R$ 15,99" />
+          <PlanButton label="1 mês" price="R$ 15,99" onClick={openAuth} />
         </section>
 
         {/* Promotions */}
