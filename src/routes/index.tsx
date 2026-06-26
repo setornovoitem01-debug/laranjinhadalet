@@ -105,7 +105,7 @@ function ProfilePage() {
         {/* Subscriptions */}
         <section className="px-4 mt-6">
           <h3 className="text-base font-semibold mb-3">Assinaturas</h3>
-          <PlanButton label="1 mês" price="R$ 00,00" />
+          <PlanButton label="1 mês" price="R$ 15,99" />
         </section>
 
         {/* Promotions */}
@@ -121,16 +121,40 @@ function ProfilePage() {
           </button>
           {promosOpen && (
             <div className="space-y-3">
-              <PlanButton label="3 meses (00% off )" price="R$ 00,00" />
-              <PlanButton label="6 meses (00% off )" price="R$ 00,00" />
+              <PlanButton label="3 meses" price="R$ 21,90" />
+              <PlanButton label="Vitalício" price="R$ 35,80" />
             </div>
           )}
         </section>
 
+        {/* Tabs */}
+        <nav className="mt-8 border-t border-border">
+          <div className="grid grid-cols-2">
+            <TabButton
+              active={tab === "posts"}
+              onClick={() => setTab("posts")}
+              icon={<Smartphone className="h-5 w-5" />}
+              label="55 Postagens"
+            />
+            <TabButton
+              active={tab === "media"}
+              onClick={() => setTab("media")}
+              icon={<Film className="h-5 w-5" />}
+              label="105 Mídias"
+            />
+          </div>
+          <div className="relative h-0.5 bg-transparent">
+            <div
+              className={`absolute top-0 h-0.5 w-1/2 bg-[oklch(0.78_0.17_45)] transition-transform ${
+                tab === "media" ? "translate-x-full" : ""
+              }`}
+            />
+          </div>
+        </nav>
+
         {/* Locked post preview */}
-        <section className="px-3 mt-6">
+        <section className="px-3 mt-4">
           <article className="rounded-2xl bg-surface overflow-hidden border border-border">
-            {/* Post header */}
             <div className="flex items-center justify-between px-3 py-3">
               <div className="flex items-center gap-2">
                 <div className="h-10 w-10 rounded-full bg-surface-2 grid place-items-center text-base">
@@ -149,7 +173,6 @@ function ProfilePage() {
               </button>
             </div>
 
-            {/* Locked media */}
             <div className="relative mx-3 mb-3 aspect-square rounded-2xl bg-[oklch(0.93_0.015_85)] grid place-items-center overflow-hidden">
               <Lock className="h-12 w-12 text-[oklch(0.55_0.04_260)]" strokeWidth={2.25} />
               <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-4 text-[oklch(0.4_0.03_260)] text-sm font-medium">
@@ -165,7 +188,6 @@ function ProfilePage() {
               </div>
             </div>
 
-            {/* Post actions */}
             <div className="flex items-center justify-between px-4 pb-4">
               <div className="flex items-center gap-4 text-foreground">
                 <Heart className="h-5 w-5" />
@@ -176,33 +198,6 @@ function ProfilePage() {
             </div>
           </article>
         </section>
-
-        {/* Bottom tabs */}
-        <nav className="fixed bottom-0 left-0 right-0 flex justify-center pointer-events-none">
-          <div className="pointer-events-auto w-full max-w-[420px] bg-background border-t border-border">
-            <div className="grid grid-cols-2">
-              <TabButton
-                active={tab === "posts"}
-                onClick={() => setTab("posts")}
-                icon={<Smartphone className="h-5 w-5" />}
-                label="55 Postagens"
-              />
-              <TabButton
-                active={tab === "media"}
-                onClick={() => setTab("media")}
-                icon={<Film className="h-5 w-5" />}
-                label="105 Mídias"
-              />
-            </div>
-            <div className="relative h-0.5 bg-transparent">
-              <div
-                className={`absolute top-0 h-0.5 w-1/2 bg-[oklch(0.78_0.17_45)] transition-transform ${
-                  tab === "media" ? "translate-x-full" : ""
-                }`}
-              />
-            </div>
-          </div>
-        </nav>
       </div>
     </div>
   );
