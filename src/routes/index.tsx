@@ -210,6 +210,11 @@ function ProfilePage() {
     setAuthOpen(true);
   };
 
+  const resetAuth = () => {
+    setAuthOpen(false);
+    setAuthView("menu");
+  };
+
   const parsePrice = (price: string) => {
     const n = Number(price.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
     return Number.isFinite(n) ? n : 0;
