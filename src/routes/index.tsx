@@ -158,6 +158,8 @@ function ProfilePage() {
   };
 
   const goCheckout = async (values: Record<string, string>) => {
+    customerRef.current = values;
+    setBackOfferShown(false);
     setAuthOpen(false);
     setCheckoutMode(true);
     setPixLoading(true);
