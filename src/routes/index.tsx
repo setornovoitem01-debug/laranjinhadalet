@@ -449,7 +449,7 @@ function AuthForm({
   fields: AuthField[];
   submitLabel: string;
   onBack: () => void;
-  onSubmit: () => void;
+  onSubmit: (values: Record<string, string>) => void;
 }) {
   const [values, setValues] = useState<Record<string, string>>({});
   const allFilled = fields.every((f) => (values[f.name] ?? "").trim().length > 0);
@@ -458,7 +458,7 @@ function AuthForm({
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        if (allFilled) onSubmit();
+        if (allFilled) onSubmit(values);
       }}
       className="flex flex-col gap-3"
     >
