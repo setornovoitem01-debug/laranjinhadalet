@@ -211,7 +211,58 @@ function ProfilePage() {
           </article>
         </section>
       </div>
+
+      <Dialog open={authOpen} onOpenChange={setAuthOpen}>
+        <DialogContent className="max-w-[360px] rounded-2xl p-6 bg-[oklch(0.985_0.005_60)] border-0">
+          <DialogHeader>
+            <DialogTitle className="text-left text-xl">Acesse sua conta</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground mb-2">
+            Escolha como deseja continuar para concluir sua assinatura.
+          </p>
+          <div className="flex flex-col gap-3">
+            <AuthOption
+              icon={<LogIn className="h-5 w-5" />}
+              title="Acesse sua conta"
+              description="Já sou cadastrado(a)"
+            />
+            <AuthOption
+              icon={<UserPlus className="h-5 w-5" />}
+              title="Criar conta"
+              description="Sou novo(a) por aqui"
+            />
+            <AuthOption
+              icon={<EyeOff className="h-5 w-5" />}
+              title="Assinar de forma anônima"
+              description="Sem cadastro, com privacidade"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function AuthOption({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <button className="w-full flex items-center gap-3 rounded-2xl bg-background border border-border px-4 py-3 text-left hover:bg-surface-2 transition-colors">
+      <div className="h-10 w-10 rounded-full grid place-items-center bg-[oklch(0.96_0.04_45)] text-[oklch(0.55_0.17_35)]">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-foreground">{title}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
+      </div>
+      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+    </button>
   );
 }
 
