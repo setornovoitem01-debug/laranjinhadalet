@@ -59,7 +59,90 @@ function ProfilePage() {
   const [pixQr, setPixQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const createPix = useServerFn(createPixPayment);
+  // Back-redirect / oferta especial
+  const customerRef = useRef<Record<string, string>>({});
+  const [backOfferOpen, setBackOfferOpen] = useState(false);
+  const [backOfferShown, setBackOfferShown] = useState(false);
+  const [offerSecondsLeft, setOfferSecondsLeft] = useState(180);
+  const [offerPixLoading, setOfferPixLoading] = useState(false);
+  const [offerPixError, setOfferPixError] = useState<string | null>(null);
+  const [offerPixCode, setOfferPixCode] = useState<string | null>(null);
+  const [offerCopied, setOfferCopied] = useState(false);
+
+  const OFFER_PRICE_LABEL = "R$ 9,90";
+  const OFFER_AMOUNT = 9.9;
+
+  useEffect(() => {
+    if (!backOfferOpen) return;
+    if (offerSecondsLeft <= 0) return;
+    const t = setInterval(() => setOfferSecondsLeft((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [backOfferOpen, offerSecondsLeft]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60).toString().padStart(2, "0");
+    const r = (s % 60).toString().padStart(2, "0");
+    return `${m}:${r}`;
+  };
+
+  const tryLeaveCheckout = (onConfirmLeave: () => void) => {
+    if (checkoutMode && !backOfferShown) {
+      setBackOfferShown(true);
+      setOfferSecondsLeft(180);
+      setOfferPixCode(null);
+      setOfferPixError(null);
+      setBackOfferOpen(true);
+    } else {
+      onConfirmLeave();
+    }
+  };
+
+  const exitCheckout = () => {
+    setCheckoutMode(false);
+    setPixCode(null);
+    setPixQr(null);
+    setPixError(null);
+    setBackOfferOpen(false);
+  };
+
+  const acceptOffer = async () => {
+    if (offerSecondsLeft <= 0) return;
+    setOfferPixLoading(true);
+    setOfferPixError(null);
+    setOfferPixCode(null);
+    try {
+      const v = customerRef.current;
+      const res = await createPix({
+        data: {
+          amount: OFFER_AMOUNT,
+          description: `Oferta especial vitalícia + chamada 10min — @${HANDLE}`,
+          customerEmail: v.email || "anonimo@example.com",
+          customerName: v.name,
+          customerDocument: v.cpf,
+        },
+      });
+      if (!res.ok || !res.pixCopyPaste) {
+        setOfferPixError(res.error || "Não foi possível gerar o Pix.");
+      } else {
+        setOfferPixCode(res.pixCopyPaste);
+      }
+    } catch {
+      setOfferPixError("Erro inesperado ao gerar o Pix.");
+    } finally {
+      setOfferPixLoading(false);
+    }
+  };
+
+  const copyOfferPix = async () => {
+    if (!offerPixCode) return;
+    try {
+      await navigator.clipboard.writeText(offerPixCode);
+      setOfferCopied(true);
+      setTimeout(() => setOfferCopied(false), 2000);
+    } catch {
+      /* noop */
+    }
+  };
 
   const openAuth = (label: string, price: string) => {
     setSelectedPlan({ label, price });
