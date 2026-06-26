@@ -53,14 +53,65 @@ function ProfilePage() {
     price: "R$ 15,99",
   });
   const [checkoutMode, setCheckoutMode] = useState(false);
+  const [pixLoading, setPixLoading] = useState(false);
+  const [pixError, setPixError] = useState<string | null>(null);
+  const [pixCode, setPixCode] = useState<string | null>(null);
+  const [pixQr, setPixQr] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const createPix = useServerFn(createPixPayment);
+
   const openAuth = (label: string, price: string) => {
     setSelectedPlan({ label, price });
     setAuthView("menu");
     setAuthOpen(true);
   };
-  const goCheckout = () => {
+
+  const parsePrice = (price: string) => {
+    const n = Number(price.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const goCheckout = async (values: Record<string, string>) => {
     setAuthOpen(false);
     setCheckoutMode(true);
+    setPixLoading(true);
+    setPixError(null);
+    setPixCode(null);
+    setPixQr(null);
+    try {
+      const amount = parsePrice(selectedPlan.price);
+      const res = await createPix({
+        data: {
+          amount,
+          description: `Assinatura ${selectedPlan.label} — @${HANDLE}`,
+          customerEmail: values.email || "anonimo@example.com",
+          customerName: values.name,
+          customerDocument: values.cpf,
+        },
+      });
+      if (!res.ok || !res.pixCopyPaste) {
+        setPixError(res.error || "Não foi possível gerar o Pix.");
+      } else {
+        setPixCode(res.pixCopyPaste);
+        setPixQr(res.qrCodeBase64 ?? null);
+      }
+    } catch (e) {
+      setPixError("Erro inesperado ao gerar o Pix.");
+    } finally {
+      setPixLoading(false);
+    }
+  };
+
+  const copyPix = async () => {
+    if (!pixCode) return;
+    try {
+      await navigator.clipboard.writeText(pixCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* noop */
+    }
   };
 
   return (
