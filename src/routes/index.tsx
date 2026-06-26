@@ -549,3 +549,17 @@ function BenefitItem({ text }: { text: string }) {
     </li>
   );
 }
+
+function PayStep({ n, title, text }: { n: number; title: string; text: string }) {
+  return (
+    <li className="flex gap-3">
+      <span className="h-7 w-7 shrink-0 rounded-full grid place-items-center bg-[oklch(0.96_0.04_45)] text-[oklch(0.55_0.17_35)] text-sm font-semibold">
+        {n}
+      </span>
+      <div className="flex-1">
+        <div className="text-sm font-medium text-foreground">{title}</div>
+        <div className="text-xs text-muted-foreground">{text}</div>
+      </div>
+    </li>
+  );
+}
