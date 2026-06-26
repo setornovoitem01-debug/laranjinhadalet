@@ -310,7 +310,7 @@ function ProfilePage() {
               ]}
               submitLabel="Entrar"
               onBack={() => setAuthView("menu")}
-              onSubmit={() => setAuthView("success")}
+              onSubmit={goCheckout}
             />
           )}
 
@@ -324,7 +324,7 @@ function ProfilePage() {
               ]}
               submitLabel="Criar conta e continuar"
               onBack={() => setAuthView("menu")}
-              onSubmit={() => setAuthView("success")}
+              onSubmit={goCheckout}
             />
           )}
 
@@ -333,23 +333,10 @@ function ProfilePage() {
               fields={[{ name: "email", label: "Email", type: "email" }]}
               submitLabel="Continuar anonimamente"
               onBack={() => setAuthView("menu")}
-              onSubmit={() => setAuthView("success")}
+              onSubmit={goCheckout}
             />
           )}
 
-          {authView === "success" && (
-            <div className="flex flex-col gap-4 py-2">
-              <p className="text-sm text-foreground">
-                Pagamento liberado. Você já pode acessar todo o conteúdo exclusivo.
-              </p>
-              <button
-                onClick={() => setAuthOpen(false)}
-                className="gradient-orange w-full rounded-full h-11 text-brand-foreground font-medium"
-              >
-                Acessar conteúdo
-              </button>
-            </div>
-          )}
         </DialogContent>
       </Dialog>
 
