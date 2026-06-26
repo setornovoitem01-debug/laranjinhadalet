@@ -224,9 +224,9 @@ function Stat({ icon, value }: { icon: React.ReactNode; value: string }) {
   );
 }
 
-function PlanButton({ label, price }: { label: string; price: string }) {
+function PlanButton({ label, price, onClick }: { label: string; price: string; onClick?: () => void }) {
   return (
-    <button className="gradient-orange w-full rounded-full h-12 px-5 flex items-center justify-between text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)]">
+    <button onClick={onClick} className="gradient-orange w-full rounded-full h-12 px-5 flex items-center justify-between text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)]">
       <span>{label}</span>
       <span>{price}</span>
     </button>
