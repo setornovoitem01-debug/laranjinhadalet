@@ -70,10 +70,11 @@ function ProfilePage() {
         {/* Cover */}
         <div className="px-3 mt-1">
           <div className="relative h-44 rounded-2xl overflow-hidden bg-surface-2">
-            <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.35_0.05_30)] via-[oklch(0.25_0.03_260)] to-[oklch(0.2_0.02_270)]" />
-            <span className="absolute bottom-2 right-3 text-[10px] text-muted-foreground/70">
-              capa (placeholder)
-            </span>
+            <img
+              src={COVER_IMG}
+              alt="capa"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[420px] w-44 object-cover -rotate-90"
+            />
           </div>
         </div>
 
