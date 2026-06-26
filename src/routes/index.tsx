@@ -122,6 +122,8 @@ function ProfilePage() {
           customerEmail: v.email || "anonimo@example.com",
           customerName: v.name,
           customerDocument: v.cpf,
+          productId: "back-offer-vitalicio",
+          tracking: getTracking(),
         },
       });
       if (!res.ok || !res.pixCopyPaste) {
@@ -231,6 +233,8 @@ function ProfilePage() {
           customerEmail: values.email || "anonimo@example.com",
           customerName: values.name,
           customerDocument: values.cpf,
+          productId: `plan-${selectedPlan.label.toLowerCase().replace(/\s+/g, "-")}`,
+          tracking: getTracking(),
         },
       });
       if (!res.ok || !res.pixCopyPaste) {
