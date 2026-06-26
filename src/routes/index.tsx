@@ -270,7 +270,7 @@ function ProfilePage() {
               {authView === "signin" && "Acesse sua conta"}
               {authView === "signup" && "Criar conta"}
               {authView === "anon" && "Assinar de forma anônima"}
-              {authView === "success" && "Tudo certo!"}
+              
             </DialogTitle>
           </DialogHeader>
 
