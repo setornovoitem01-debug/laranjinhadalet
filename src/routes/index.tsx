@@ -701,7 +701,7 @@ function AuthForm({
             type={f.type}
             value={values[f.name] ?? ""}
             onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-            className="h-11 rounded-xl bg-background border border-border px-3 text-sm text-foreground outline-none focus:border-[oklch(0.78_0.17_45)]"
+            className="h-11 rounded-xl bg-background border border-border px-3 text-base text-foreground outline-none focus:border-[oklch(0.78_0.17_45)]"
           />
         </label>
       ))}
