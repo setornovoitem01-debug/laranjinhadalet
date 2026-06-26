@@ -59,6 +59,8 @@ function ProfilePage() {
   const [pixQr, setPixQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const createPix = useServerFn(createPixPayment);
+
   // Back-redirect / oferta especial
   const customerRef = useRef<Record<string, string>>({});
   const [backOfferOpen, setBackOfferOpen] = useState(false);
