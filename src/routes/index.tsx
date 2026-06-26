@@ -200,12 +200,6 @@ function ProfilePage() {
               <p className="text-xs text-muted-foreground">Valor</p>
               <p className="text-2xl font-semibold mt-1 mb-4">{selectedPlan.price}</p>
 
-              {pixQr && (
-                <div className="flex justify-center mb-4">
-                  <img src={pixQr} alt="QR Code Pix" className="h-44 w-44 rounded-xl border border-border bg-white p-2" />
-                </div>
-              )}
-
               <div className="rounded-2xl border border-border bg-surface px-4 py-3 mb-4 overflow-hidden min-h-[48px] flex items-center">
                 {pixLoading ? (
                   <p className="text-xs text-muted-foreground">Gerando código Pix…</p>
@@ -226,6 +220,15 @@ function ProfilePage() {
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 {copied ? "Copiado!" : "Copiar chave Pix"}
               </button>
+
+              <div className="mt-6">
+                <h4 className="text-sm font-semibold mb-3">Como pagar em 3 passos</h4>
+                <ol className="space-y-3">
+                  <PayStep n={1} title="Copie o código Pix" text="Toque em “Copiar chave Pix” acima." />
+                  <PayStep n={2} title="Abra o app do seu banco" text="Entre na área Pix e escolha “Pix Copia e Cola”." />
+                  <PayStep n={3} title="Cole o código e confirme" text="Revise o valor e finalize o pagamento. A liberação é automática." />
+                </ol>
+              </div>
             </section>
           </>
         ) : (
@@ -543,6 +546,20 @@ function BenefitItem({ text }: { text: string }) {
         <Check className="h-3.5 w-3.5" strokeWidth={3} />
       </span>
       {text}
+    </li>
+  );
+}
+
+function PayStep({ n, title, text }: { n: number; title: string; text: string }) {
+  return (
+    <li className="flex gap-3">
+      <span className="h-7 w-7 shrink-0 rounded-full grid place-items-center bg-[oklch(0.96_0.04_45)] text-[oklch(0.55_0.17_35)] text-sm font-semibold">
+        {n}
+      </span>
+      <div className="flex-1">
+        <div className="text-sm font-medium text-foreground">{title}</div>
+        <div className="text-xs text-muted-foreground">{text}</div>
+      </div>
     </li>
   );
 }
