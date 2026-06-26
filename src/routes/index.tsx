@@ -14,8 +14,20 @@ import {
   DollarSign,
   Bookmark,
   Image as ImageIcon,
+  LogIn,
+  UserPlus,
+  EyeOff,
+  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import profileAsset from "@/assets/profile.png.asset.json";
+import coverAsset from "@/assets/cover.png.asset.json";
+
+const PROFILE_IMG = profileAsset.url;
+const COVER_IMG = coverAsset.url;
+const DISPLAY_NAME = "leticia";
+const HANDLE = "lettvargas";
 import profileAsset from "@/assets/profile.png.asset.json";
 import coverAsset from "@/assets/cover.png.asset.json";
 
