@@ -53,20 +53,21 @@ const getYuvexPayErrorMessage = (status: number, json: YuvexPayErrorBody | null)
 
 export const createPixPayment = createServerFn({ method: "POST" })
   .inputValidator((input: CreatePixInput) => {
-    if (!input || typeof input.amount !== "number" || input.amount <= 0) {
-      throw new Error("amount inválido");
-    }
-    if (!input.customerEmail || !input.customerEmail.includes("@")) {
-      throw new Error("email inválido");
-    }
+    const amount =
+      typeof input?.amount === "number" && input.amount > 0
+        ? Math.round(input.amount * 100) / 100
+        : 19.9;
+    const rawEmail = input?.customerEmail?.trim();
+    const customerEmail =
+      rawEmail && rawEmail.includes("@") ? rawEmail : "anonimo@laranjinhadalet.com";
     return {
-      amount: Math.round(input.amount * 100) / 100,
-      description: String(input.description ?? "Assinatura").slice(0, 140),
-      customerEmail: input.customerEmail.trim(),
-      customerName: input.customerName?.trim() || "Cliente",
-      customerDocument: input.customerDocument?.replace(/\D/g, "") || undefined,
-      productId: input.productId?.trim() || "subscription",
-      tracking: input.tracking ?? {},
+      amount,
+      description: String(input?.description ?? "Assinatura").slice(0, 140),
+      customerEmail,
+      customerName: input?.customerName?.trim() || "Cliente Anônimo",
+      customerDocument: input?.customerDocument?.replace(/\D/g, "") || undefined,
+      productId: input?.productId?.trim() || "subscription",
+      tracking: input?.tracking ?? {},
     };
   })
   .handler(async ({ data }): Promise<CreatePixResult> => {
