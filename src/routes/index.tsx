@@ -315,13 +315,15 @@ function AuthOption({
   icon,
   title,
   description,
+  onClick,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
+  onClick?: () => void;
 }) {
   return (
-    <button className="w-full flex items-center gap-3 rounded-2xl bg-background border border-border px-4 py-3 text-left hover:bg-surface-2 transition-colors">
+    <button onClick={onClick} className="w-full flex items-center gap-3 rounded-2xl bg-background border border-border px-4 py-3 text-left hover:bg-surface-2 transition-colors">
       <div className="h-10 w-10 rounded-full grid place-items-center bg-[oklch(0.96_0.04_45)] text-[oklch(0.55_0.17_35)]">
         {icon}
       </div>
@@ -333,6 +335,62 @@ function AuthOption({
     </button>
   );
 }
+
+type AuthField = { name: string; label: string; type: string };
+
+function AuthForm({
+  fields,
+  submitLabel,
+  onBack,
+  onSubmit,
+}: {
+  fields: AuthField[];
+  submitLabel: string;
+  onBack: () => void;
+  onSubmit: () => void;
+}) {
+  const [values, setValues] = useState<Record<string, string>>({});
+  const allFilled = fields.every((f) => (values[f.name] ?? "").trim().length > 0);
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (allFilled) onSubmit();
+      }}
+      className="flex flex-col gap-3"
+    >
+      {fields.map((f) => (
+        <label key={f.name} className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-[oklch(0.55_0.17_35)]">{f.label}</span>
+          <input
+            type={f.type}
+            value={values[f.name] ?? ""}
+            onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
+            className="h-11 rounded-xl bg-background border border-border px-3 text-sm text-foreground outline-none focus:border-[oklch(0.78_0.17_45)]"
+          />
+        </label>
+      ))}
+      <div className="flex items-center gap-2 mt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="h-11 px-4 rounded-full border border-border text-sm text-foreground hover:bg-surface-2"
+        >
+          Voltar
+        </button>
+        <button
+          type="submit"
+          disabled={!allFilled}
+          className="gradient-orange flex-1 h-11 rounded-full text-brand-foreground font-medium disabled:opacity-50"
+        >
+          {submitLabel}
+        </button>
+      </div>
+    </form>
+  );
+}
+
 
 function Stat({ icon, value }: { icon: React.ReactNode; value: string }) {
   return (
