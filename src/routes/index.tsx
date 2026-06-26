@@ -21,7 +21,7 @@ import {
   Check,
   Copy,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import profileAsset from "@/assets/profile.png.asset.json";
@@ -61,6 +61,91 @@ function ProfilePage() {
 
   const createPix = useServerFn(createPixPayment);
 
+  // Back-redirect / oferta especial
+  const customerRef = useRef<Record<string, string>>({});
+  const [backOfferOpen, setBackOfferOpen] = useState(false);
+  const [backOfferShown, setBackOfferShown] = useState(false);
+  const [offerSecondsLeft, setOfferSecondsLeft] = useState(180);
+  const [offerPixLoading, setOfferPixLoading] = useState(false);
+  const [offerPixError, setOfferPixError] = useState<string | null>(null);
+  const [offerPixCode, setOfferPixCode] = useState<string | null>(null);
+  const [offerCopied, setOfferCopied] = useState(false);
+
+  const OFFER_PRICE_LABEL = "R$ 9,90";
+  const OFFER_AMOUNT = 9.9;
+
+  useEffect(() => {
+    if (!backOfferOpen) return;
+    if (offerSecondsLeft <= 0) return;
+    const t = setInterval(() => setOfferSecondsLeft((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [backOfferOpen, offerSecondsLeft]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60).toString().padStart(2, "0");
+    const r = (s % 60).toString().padStart(2, "0");
+    return `${m}:${r}`;
+  };
+
+  const tryLeaveCheckout = (onConfirmLeave: () => void) => {
+    if (checkoutMode && !backOfferShown) {
+      setBackOfferShown(true);
+      setOfferSecondsLeft(180);
+      setOfferPixCode(null);
+      setOfferPixError(null);
+      setBackOfferOpen(true);
+    } else {
+      onConfirmLeave();
+    }
+  };
+
+  const exitCheckout = () => {
+    setCheckoutMode(false);
+    setPixCode(null);
+    setPixQr(null);
+    setPixError(null);
+    setBackOfferOpen(false);
+  };
+
+  const acceptOffer = async () => {
+    if (offerSecondsLeft <= 0) return;
+    setOfferPixLoading(true);
+    setOfferPixError(null);
+    setOfferPixCode(null);
+    try {
+      const v = customerRef.current;
+      const res = await createPix({
+        data: {
+          amount: OFFER_AMOUNT,
+          description: `Oferta especial vitalícia + chamada 10min — @${HANDLE}`,
+          customerEmail: v.email || "anonimo@example.com",
+          customerName: v.name,
+          customerDocument: v.cpf,
+        },
+      });
+      if (!res.ok || !res.pixCopyPaste) {
+        setOfferPixError(res.error || "Não foi possível gerar o Pix.");
+      } else {
+        setOfferPixCode(res.pixCopyPaste);
+      }
+    } catch {
+      setOfferPixError("Erro inesperado ao gerar o Pix.");
+    } finally {
+      setOfferPixLoading(false);
+    }
+  };
+
+  const copyOfferPix = async () => {
+    if (!offerPixCode) return;
+    try {
+      await navigator.clipboard.writeText(offerPixCode);
+      setOfferCopied(true);
+      setTimeout(() => setOfferCopied(false), 2000);
+    } catch {
+      /* noop */
+    }
+  };
+
   const openAuth = (label: string, price: string) => {
     setSelectedPlan({ label, price });
     setAuthView("menu");
@@ -73,6 +158,8 @@ function ProfilePage() {
   };
 
   const goCheckout = async (values: Record<string, string>) => {
+    customerRef.current = values;
+    setBackOfferShown(false);
     setAuthOpen(false);
     setCheckoutMode(true);
     setPixLoading(true);
@@ -119,9 +206,12 @@ function ProfilePage() {
       <div className="w-full max-w-[420px] min-h-screen bg-background relative pb-24">
         {/* Top bar */}
         <header className="relative flex items-center justify-center px-4 pt-4 pb-3">
-          <div className="text-2xl font-semibold tracking-tight">
+          <button
+            onClick={() => tryLeaveCheckout(() => {})}
+            className="text-2xl font-semibold tracking-tight cursor-pointer"
+          >
             privacy<span className="text-[oklch(0.78_0.17_45)]">.</span>
-          </div>
+          </button>
           <button className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground">
             <Globe className="h-5 w-5" />
           </button>
@@ -129,7 +219,10 @@ function ProfilePage() {
 
         {/* Sub header */}
         <div className="flex items-center justify-between px-4 py-2">
-          <button className="h-8 w-8 flex items-center justify-center">
+          <button
+            onClick={() => tryLeaveCheckout(exitCheckout)}
+            className="h-8 w-8 flex items-center justify-center"
+          >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <h1 className="text-base font-medium">{DISPLAY_NAME}</h1>
@@ -409,6 +502,73 @@ function ProfilePage() {
             />
           )}
 
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={backOfferOpen} onOpenChange={setBackOfferOpen}>
+        <DialogContent className="max-w-[360px] rounded-2xl p-6 bg-[oklch(0.985_0.005_60)] border-0">
+          <DialogHeader>
+            <DialogTitle className="text-left text-xl">Espera! Oferta exclusiva 🔥</DialogTitle>
+          </DialogHeader>
+
+          <div className="rounded-xl bg-[oklch(0.96_0.04_45)] text-[oklch(0.45_0.15_35)] px-3 py-2 text-center text-xs font-semibold">
+            ⏱ Você tem {formatTime(offerSecondsLeft)} para aceitar
+          </div>
+
+          <p className="text-sm text-foreground mt-2">
+            Só agora, leve o <b>acesso vitalício</b> ao meu conteúdo + <b>uma chamada de vídeo de 10 minutos</b> comigo por apenas:
+          </p>
+          <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-3xl font-bold text-foreground">{OFFER_PRICE_LABEL}</span>
+            <span className="text-xs text-muted-foreground line-through">de R$ 35,80</span>
+          </div>
+
+          {offerPixCode ? (
+            <>
+              <div className="rounded-2xl border border-border bg-surface px-4 py-3 mt-3 overflow-hidden">
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Pix Copia e Cola</p>
+                <p className="text-xs text-foreground font-mono break-all line-clamp-3">{offerPixCode}</p>
+              </div>
+              <button
+                onClick={copyOfferPix}
+                className="gradient-orange w-full rounded-full h-12 mt-3 text-brand-foreground font-medium flex items-center justify-center gap-2"
+              >
+                {offerCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {offerCopied ? "Copiado!" : "Copiar chave Pix"}
+              </button>
+              <p className="text-[11px] text-muted-foreground text-center mt-2">
+                Cole no app do seu banco em Pix Copia e Cola e finalize.
+              </p>
+            </>
+          ) : (
+            <>
+              {offerPixError && (
+                <p className="text-xs text-destructive mt-2">{offerPixError}</p>
+              )}
+              <div className="flex flex-col gap-2 mt-4">
+                <button
+                  onClick={acceptOffer}
+                  disabled={offerPixLoading || offerSecondsLeft <= 0}
+                  className="gradient-orange w-full rounded-full h-12 text-brand-foreground font-medium disabled:opacity-50"
+                >
+                  {offerPixLoading
+                    ? "Gerando Pix…"
+                    : offerSecondsLeft <= 0
+                      ? "Oferta expirada"
+                      : `Aceitar oferta por ${OFFER_PRICE_LABEL}`}
+                </button>
+                <button
+                  onClick={() => {
+                    setBackOfferOpen(false);
+                    exitCheckout();
+                  }}
+                  className="w-full h-10 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Não, recusar e sair
+                </button>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 
