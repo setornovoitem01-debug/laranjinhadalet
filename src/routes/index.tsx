@@ -45,15 +45,20 @@ function ProfilePage() {
   const [promosOpen, setPromosOpen] = useState(true);
   const [tab, setTab] = useState<"posts" | "media">("posts");
   const [authOpen, setAuthOpen] = useState(false);
-  const [authView, setAuthView] = useState<"menu" | "signin" | "signup" | "anon" | "checkout">("menu");
+  const [authView, setAuthView] = useState<"menu" | "signin" | "signup" | "anon">("menu");
   const [selectedPlan, setSelectedPlan] = useState<{ label: string; price: string }>({
     label: "1 mês",
     price: "R$ 15,99",
   });
+  const [checkoutMode, setCheckoutMode] = useState(false);
   const openAuth = (label: string, price: string) => {
     setSelectedPlan({ label, price });
     setAuthView("menu");
     setAuthOpen(true);
+  };
+  const goCheckout = () => {
+    setAuthOpen(false);
+    setCheckoutMode(true);
   };
 
   return (
