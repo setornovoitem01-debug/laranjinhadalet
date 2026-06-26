@@ -200,15 +200,31 @@ function ProfilePage() {
               <p className="text-xs text-muted-foreground">Valor</p>
               <p className="text-2xl font-semibold mt-1 mb-4">{selectedPlan.price}</p>
 
-              <div className="rounded-full border border-border bg-surface px-4 py-3 mb-4 overflow-hidden">
-                <p className="text-xs text-muted-foreground truncate font-mono">
-                  00020101021226640014br.gov.bcb.pix2542pix.m…
-                </p>
+              {pixQr && (
+                <div className="flex justify-center mb-4">
+                  <img src={pixQr} alt="QR Code Pix" className="h-44 w-44 rounded-xl border border-border bg-white p-2" />
+                </div>
+              )}
+
+              <div className="rounded-2xl border border-border bg-surface px-4 py-3 mb-4 overflow-hidden min-h-[48px] flex items-center">
+                {pixLoading ? (
+                  <p className="text-xs text-muted-foreground">Gerando código Pix…</p>
+                ) : pixError ? (
+                  <p className="text-xs text-destructive">{pixError}</p>
+                ) : pixCode ? (
+                  <p className="text-xs text-muted-foreground font-mono break-all line-clamp-2">{pixCode}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Aguardando…</p>
+                )}
               </div>
 
-              <button className="gradient-orange w-full rounded-full h-12 text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)] flex items-center justify-center gap-2">
-                <Copy className="h-4 w-4" />
-                Copiar chave Pix
+              <button
+                onClick={copyPix}
+                disabled={!pixCode}
+                className="gradient-orange w-full rounded-full h-12 text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)] flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? "Copiado!" : "Copiar chave Pix"}
               </button>
             </section>
           </>
