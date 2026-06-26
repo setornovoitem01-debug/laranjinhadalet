@@ -206,9 +206,12 @@ function ProfilePage() {
       <div className="w-full max-w-[420px] min-h-screen bg-background relative pb-24">
         {/* Top bar */}
         <header className="relative flex items-center justify-center px-4 pt-4 pb-3">
-          <div className="text-2xl font-semibold tracking-tight">
+          <button
+            onClick={() => tryLeaveCheckout(() => {})}
+            className="text-2xl font-semibold tracking-tight cursor-pointer"
+          >
             privacy<span className="text-[oklch(0.78_0.17_45)]">.</span>
-          </div>
+          </button>
           <button className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground">
             <Globe className="h-5 w-5" />
           </button>
@@ -216,7 +219,10 @@ function ProfilePage() {
 
         {/* Sub header */}
         <div className="flex items-center justify-between px-4 py-2">
-          <button className="h-8 w-8 flex items-center justify-center">
+          <button
+            onClick={() => tryLeaveCheckout(exitCheckout)}
+            className="h-8 w-8 flex items-center justify-center"
+          >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <h1 className="text-base font-medium">{DISPLAY_NAME}</h1>
