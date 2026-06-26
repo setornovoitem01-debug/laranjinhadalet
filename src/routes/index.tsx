@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowLeft,
-  Compass,
   MoreVertical,
   Images,
   Film,
@@ -18,6 +17,9 @@ import {
   UserPlus,
   EyeOff,
   ChevronRight,
+  Globe,
+  Check,
+  Copy,
 } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
