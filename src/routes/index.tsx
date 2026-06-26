@@ -100,7 +100,7 @@ function ProfilePage() {
           <p className="text-sm text-muted-foreground">@{HANDLE}</p>
 
           <p className="text-sm mt-3 leading-relaxed">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore...
+            19 anos, estudante de Ed. Física. Conteúdo exclusivo e bate-papo diário com os assinantes 💬✨
           </p>
           <button className="text-sm text-[oklch(0.78_0.17_45)] font-medium mt-1">
             Ler mais
