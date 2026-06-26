@@ -219,30 +219,94 @@ function ProfilePage() {
       <Dialog open={authOpen} onOpenChange={setAuthOpen}>
         <DialogContent className="max-w-[360px] rounded-2xl p-6 bg-[oklch(0.985_0.005_60)] border-0">
           <DialogHeader>
-            <DialogTitle className="text-left text-xl">Acesse sua conta</DialogTitle>
+            <DialogTitle className="text-left text-xl">
+              {authView === "menu" && "Acesse sua conta"}
+              {authView === "signin" && "Acesse sua conta"}
+              {authView === "signup" && "Criar conta"}
+              {authView === "anon" && "Assinar de forma anônima"}
+              {authView === "success" && "Tudo certo!"}
+            </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground mb-2">
-            Escolha como deseja continuar para concluir sua assinatura.
-          </p>
-          <div className="flex flex-col gap-3">
-            <AuthOption
-              icon={<LogIn className="h-5 w-5" />}
-              title="Acesse sua conta"
-              description="Já sou cadastrado(a)"
+
+          {authView === "menu" && (
+            <>
+              <p className="text-sm text-muted-foreground mb-2">
+                Escolha como deseja continuar para concluir sua assinatura.
+              </p>
+              <div className="flex flex-col gap-3">
+                <AuthOption
+                  icon={<LogIn className="h-5 w-5" />}
+                  title="Acesse sua conta"
+                  description="Já sou cadastrado(a)"
+                  onClick={() => setAuthView("signin")}
+                />
+                <AuthOption
+                  icon={<UserPlus className="h-5 w-5" />}
+                  title="Criar conta"
+                  description="Sou novo(a) por aqui"
+                  onClick={() => setAuthView("signup")}
+                />
+                <AuthOption
+                  icon={<EyeOff className="h-5 w-5" />}
+                  title="Assinar de forma anônima"
+                  description="Sem cadastro, com privacidade"
+                  onClick={() => setAuthView("anon")}
+                />
+              </div>
+            </>
+          )}
+
+          {authView === "signin" && (
+            <AuthForm
+              fields={[
+                { name: "email", label: "Email/CPF", type: "text" },
+                { name: "password", label: "Senha", type: "password" },
+              ]}
+              submitLabel="Entrar"
+              onBack={() => setAuthView("menu")}
+              onSubmit={() => setAuthView("success")}
             />
-            <AuthOption
-              icon={<UserPlus className="h-5 w-5" />}
-              title="Criar conta"
-              description="Sou novo(a) por aqui"
+          )}
+
+          {authView === "signup" && (
+            <AuthForm
+              fields={[
+                { name: "name", label: "Nome completo", type: "text" },
+                { name: "cpf", label: "CPF", type: "text" },
+                { name: "email", label: "Email", type: "email" },
+                { name: "password", label: "Senha", type: "password" },
+              ]}
+              submitLabel="Criar conta e continuar"
+              onBack={() => setAuthView("menu")}
+              onSubmit={() => setAuthView("success")}
             />
-            <AuthOption
-              icon={<EyeOff className="h-5 w-5" />}
-              title="Assinar de forma anônima"
-              description="Sem cadastro, com privacidade"
+          )}
+
+          {authView === "anon" && (
+            <AuthForm
+              fields={[{ name: "email", label: "Email", type: "email" }]}
+              submitLabel="Continuar anonimamente"
+              onBack={() => setAuthView("menu")}
+              onSubmit={() => setAuthView("success")}
             />
-          </div>
+          )}
+
+          {authView === "success" && (
+            <div className="flex flex-col gap-4 py-2">
+              <p className="text-sm text-foreground">
+                Pagamento liberado. Você já pode acessar todo o conteúdo exclusivo.
+              </p>
+              <button
+                onClick={() => setAuthOpen(false)}
+                className="gradient-orange w-full rounded-full h-11 text-brand-foreground font-medium"
+              >
+                Acessar conteúdo
+              </button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }
