@@ -22,9 +22,11 @@ import {
   Copy,
 } from "lucide-react";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import profileAsset from "@/assets/profile.png.asset.json";
 import coverAsset from "@/assets/cover.png.asset.json";
+import { createPixPayment } from "@/lib/pix.functions";
 
 const PROFILE_IMG = profileAsset.url;
 const COVER_IMG = coverAsset.url;
