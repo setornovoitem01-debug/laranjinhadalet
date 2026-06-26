@@ -74,27 +74,31 @@ export const createPixPayment = createServerFn({ method: "POST" })
       const res = await fetch("https://api.yuvexpay.com/v1/payments", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Basic ${btoa(`${apiKey}:x`)}`,
           "Content-Type": "application/json",
           "X-Idempotency-Key": idempotencyKey,
         },
         body: JSON.stringify(body),
       });
 
-      const json = (await res.json().catch(() => null)) as
-        | {
-            payment?: {
-              id?: string;
-              expiresAt?: string;
-              methodData?: { pixCopyPaste?: string; qrCodeBase64?: string };
-            };
-            message?: string;
-            error?: string;
-          }
-        | null;
+      const rawText = await res.text();
+      let json: {
+        payment?: {
+          id?: string;
+          expiresAt?: string;
+          methodData?: { pixCopyPaste?: string; qrCodeBase64?: string };
+        };
+        message?: string;
+        error?: string;
+      } | null = null;
+      try {
+        json = rawText ? JSON.parse(rawText) : null;
+      } catch {
+        json = null;
+      }
 
       if (!res.ok || !json?.payment?.methodData?.pixCopyPaste) {
-        console.error("YuvexPay error", res.status, json);
+        console.error("YuvexPay error", res.status, "body:", rawText?.slice(0, 500));
         return {
           ok: false,
           error: json?.message || json?.error || `Falha ao criar Pix (${res.status})`,
