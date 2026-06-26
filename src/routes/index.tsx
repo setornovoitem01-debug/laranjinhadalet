@@ -466,3 +466,14 @@ function TabButton({
     </button>
   );
 }
+
+function BenefitItem({ text }: { text: string }) {
+  return (
+    <li className="flex items-center gap-2.5 text-foreground">
+      <span className="h-5 w-5 rounded-full grid place-items-center bg-[oklch(0.96_0.04_45)] text-[oklch(0.55_0.17_35)]">
+        <Check className="h-3.5 w-3.5" strokeWidth={3} />
+      </span>
+      {text}
+    </li>
+  );
+}
