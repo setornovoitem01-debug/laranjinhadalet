@@ -505,19 +505,28 @@ function ProfilePage() {
                   icon={<LogIn className="h-5 w-5" />}
                   title="Acesse sua conta"
                   description="Já sou cadastrado(a)"
-                  onClick={() => setAuthView("signin")}
+                  onClick={() => {
+                    fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
+                    setAuthView("signin");
+                  }}
                 />
                 <AuthOption
                   icon={<UserPlus className="h-5 w-5" />}
                   title="Criar conta"
                   description="Sou novo(a) por aqui"
-                  onClick={() => setAuthView("signup")}
+                  onClick={() => {
+                    fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
+                    setAuthView("signup");
+                  }}
                 />
                 <AuthOption
                   icon={<EyeOff className="h-5 w-5" />}
                   title="Assinar de forma anônima"
                   description="Sem cadastro, com privacidade"
-                  onClick={() => setAuthView("anon")}
+                  onClick={() => {
+                    fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
+                    setAuthView("anon");
+                  }}
                 />
               </div>
             </>
