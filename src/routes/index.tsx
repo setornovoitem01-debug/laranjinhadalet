@@ -14,8 +14,13 @@ import {
   DollarSign,
   Bookmark,
   Image as ImageIcon,
+  LogIn,
+  UserPlus,
+  EyeOff,
+  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import profileAsset from "@/assets/profile.png.asset.json";
 import coverAsset from "@/assets/cover.png.asset.json";
 
@@ -37,6 +42,8 @@ export const Route = createFileRoute("/")({
 function ProfilePage() {
   const [promosOpen, setPromosOpen] = useState(true);
   const [tab, setTab] = useState<"posts" | "media">("posts");
+  const [authOpen, setAuthOpen] = useState(false);
+  const openAuth = () => setAuthOpen(true);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex justify-center">
@@ -110,7 +117,7 @@ function ProfilePage() {
         {/* Subscriptions */}
         <section className="px-4 mt-6">
           <h3 className="text-base font-semibold mb-3">Assinaturas</h3>
-          <PlanButton label="1 mês" price="R$ 15,99" />
+          <PlanButton label="1 mês" price="R$ 15,99" onClick={openAuth} />
         </section>
 
         {/* Promotions */}
@@ -126,8 +133,8 @@ function ProfilePage() {
           </button>
           {promosOpen && (
             <div className="space-y-3">
-              <PlanButton label="3 meses" price="R$ 21,90" />
-              <PlanButton label="Vitalício" price="R$ 35,80" />
+              <PlanButton label="3 meses" price="R$ 21,90" onClick={openAuth} />
+              <PlanButton label="Vitalício" price="R$ 35,80" onClick={openAuth} />
             </div>
           )}
         </section>
@@ -204,7 +211,58 @@ function ProfilePage() {
           </article>
         </section>
       </div>
+
+      <Dialog open={authOpen} onOpenChange={setAuthOpen}>
+        <DialogContent className="max-w-[360px] rounded-2xl p-6 bg-[oklch(0.985_0.005_60)] border-0">
+          <DialogHeader>
+            <DialogTitle className="text-left text-xl">Acesse sua conta</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground mb-2">
+            Escolha como deseja continuar para concluir sua assinatura.
+          </p>
+          <div className="flex flex-col gap-3">
+            <AuthOption
+              icon={<LogIn className="h-5 w-5" />}
+              title="Acesse sua conta"
+              description="Já sou cadastrado(a)"
+            />
+            <AuthOption
+              icon={<UserPlus className="h-5 w-5" />}
+              title="Criar conta"
+              description="Sou novo(a) por aqui"
+            />
+            <AuthOption
+              icon={<EyeOff className="h-5 w-5" />}
+              title="Assinar de forma anônima"
+              description="Sem cadastro, com privacidade"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function AuthOption({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <button className="w-full flex items-center gap-3 rounded-2xl bg-background border border-border px-4 py-3 text-left hover:bg-surface-2 transition-colors">
+      <div className="h-10 w-10 rounded-full grid place-items-center bg-[oklch(0.96_0.04_45)] text-[oklch(0.55_0.17_35)]">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-foreground">{title}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
+      </div>
+      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+    </button>
   );
 }
 
@@ -217,9 +275,9 @@ function Stat({ icon, value }: { icon: React.ReactNode; value: string }) {
   );
 }
 
-function PlanButton({ label, price }: { label: string; price: string }) {
+function PlanButton({ label, price, onClick }: { label: string; price: string; onClick?: () => void }) {
   return (
-    <button className="gradient-orange w-full rounded-full h-12 px-5 flex items-center justify-between text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)]">
+    <button onClick={onClick} className="gradient-orange w-full rounded-full h-12 px-5 flex items-center justify-between text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)]">
       <span>{label}</span>
       <span>{price}</span>
     </button>
