@@ -105,6 +105,7 @@ function ProfilePage() {
     setPixQr(null);
     setPixError(null);
     setBackOfferOpen(false);
+    setBackOfferShown(false);
   };
 
   const acceptOffer = async () => {
