@@ -210,6 +210,11 @@ function ProfilePage() {
     setAuthOpen(true);
   };
 
+  const resetAuth = () => {
+    setAuthOpen(false);
+    setAuthView("menu");
+  };
+
   const parsePrice = (price: string) => {
     const n = Number(price.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
     return Number.isFinite(n) ? n : 0;
@@ -386,30 +391,126 @@ function ProfilePage() {
           </>
         ) : (
           <>
-            {/* Subscriptions */}
-            <section className="px-4 mt-6">
-              <h3 className="text-base font-semibold mb-3">Assinaturas</h3>
-              <PlanButton label="1 mês" price="R$ 15,99" onClick={() => openAuth("1 mês", "R$ 15,99")} />
-            </section>
-
-            {/* Promotions */}
-            <section className="px-4 mt-5">
-              <button
-                onClick={() => setPromosOpen((v) => !v)}
-                className="w-full flex items-center justify-between mb-3"
-              >
-                <h3 className="text-base font-semibold">Promoções</h3>
-                <ChevronUp
-                  className={`h-5 w-5 transition-transform ${promosOpen ? "" : "rotate-180"}`}
-                />
-              </button>
-              {promosOpen && (
-                <div className="space-y-3">
-                  <PlanButton label="3 meses" price="R$ 21,90" onClick={() => openAuth("3 meses", "R$ 21,90")} />
-                  <PlanButton label="Vitalício" price="R$ 35,80" onClick={() => openAuth("Vitalício", "R$ 35,80")} />
+            {authOpen ? (
+              <section className="px-4 mt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-semibold">
+                    {authView === "menu" && "Acesse sua conta"}
+                    {authView === "signin" && "Entrar"}
+                    {authView === "signup" && "Criar conta"}
+                    {authView === "anon" && "Assinar anonimamente"}
+                  </h3>
+                  <span className="text-sm font-semibold text-[oklch(0.55_0.17_35)]">
+                    {selectedPlan.label} · {selectedPlan.price}
+                  </span>
                 </div>
-              )}
-            </section>
+
+                {authView === "menu" && (
+                  <>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Escolha como deseja continuar para concluir sua assinatura.
+                    </p>
+                    <div className="flex flex-col gap-3">
+                      <AuthOption
+                        icon={<LogIn className="h-5 w-5" />}
+                        title="Acesse sua conta"
+                        description="Já sou cadastrado(a)"
+                        onClick={() => {
+                          fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
+                          setAuthView("signin");
+                        }}
+                      />
+                      <AuthOption
+                        icon={<UserPlus className="h-5 w-5" />}
+                        title="Criar conta"
+                        description="Sou novo(a) por aqui"
+                        onClick={() => {
+                          fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
+                          setAuthView("signup");
+                        }}
+                      />
+                      <AuthOption
+                        icon={<EyeOff className="h-5 w-5" />}
+                        title="Assinar de forma anônima"
+                        description="Sem cadastro, com privacidade"
+                        onClick={() => {
+                          fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
+                          setAuthView("anon");
+                        }}
+                      />
+                    </div>
+                    <button
+                      onClick={resetAuth}
+                      className="mt-4 w-full h-10 text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                )}
+
+                {authView === "signin" && (
+                  <AuthForm
+                    fields={[
+                      { name: "email", label: "Email/CPF", type: "text" },
+                      { name: "password", label: "Senha", type: "password" },
+                    ]}
+                    submitLabel="Entrar"
+                    onBack={() => setAuthView("menu")}
+                    onSubmit={goCheckout}
+                  />
+                )}
+
+                {authView === "signup" && (
+                  <AuthForm
+                    fields={[
+                      { name: "name", label: "Nome completo", type: "text" },
+                      { name: "cpf", label: "CPF", type: "text" },
+                      { name: "email", label: "Email", type: "email" },
+                      { name: "password", label: "Senha", type: "password" },
+                    ]}
+                    submitLabel="Criar conta e continuar"
+                    onBack={() => setAuthView("menu")}
+                    onSubmit={goCheckout}
+                  />
+                )}
+
+                {authView === "anon" && (
+                  <AuthForm
+                    fields={[{ name: "email", label: "Email", type: "email" }]}
+                    submitLabel="Continuar anonimamente"
+                    onBack={() => setAuthView("menu")}
+                    onSubmit={goCheckout}
+                  />
+                )}
+              </section>
+            ) : (
+              <>
+                {/* Subscriptions */}
+                <section className="px-4 mt-6">
+                  <h3 className="text-base font-semibold mb-3">Assinaturas</h3>
+                  <PlanButton label="1 mês" price="R$ 15,99" onClick={() => openAuth("1 mês", "R$ 15,99")} />
+                </section>
+
+                {/* Promotions */}
+                <section className="px-4 mt-5">
+                  <button
+                    onClick={() => setPromosOpen((v) => !v)}
+                    className="w-full flex items-center justify-between mb-3"
+                  >
+                    <h3 className="text-base font-semibold">Promoções</h3>
+                    <ChevronUp
+                      className={`h-5 w-5 transition-transform ${promosOpen ? "" : "rotate-180"}`}
+                    />
+                  </button>
+                  {promosOpen && (
+                    <div className="space-y-3">
+                      <PlanButton label="3 meses" price="R$ 21,90" onClick={() => openAuth("3 meses", "R$ 21,90")} />
+                      <PlanButton label="Vitalício" price="R$ 35,80" onClick={() => openAuth("Vitalício", "R$ 35,80")} />
+                    </div>
+                  )}
+                </section>
+              </>
+            )}
 
             {/* Tabs */}
             <nav className="mt-8 border-t border-border">
@@ -487,92 +588,7 @@ function ProfilePage() {
       </div>
 
 
-      <Dialog open={authOpen} onOpenChange={setAuthOpen}>
-        <DialogContent className="max-w-[360px] rounded-2xl p-6 bg-[oklch(0.985_0.005_60)] border-0">
-          <DialogHeader>
-            <DialogTitle className="text-left text-xl">
-              {authView === "menu" && "Acesse sua conta"}
-              {authView === "signin" && "Acesse sua conta"}
-              {authView === "signup" && "Criar conta"}
-              {authView === "anon" && "Assinar de forma anônima"}
-              
-            </DialogTitle>
-          </DialogHeader>
 
-          {authView === "menu" && (
-            <>
-              <p className="text-sm text-muted-foreground mb-2">
-                Escolha como deseja continuar para concluir sua assinatura.
-              </p>
-              <div className="flex flex-col gap-3">
-                <AuthOption
-                  icon={<LogIn className="h-5 w-5" />}
-                  title="Acesse sua conta"
-                  description="Já sou cadastrado(a)"
-                  onClick={() => {
-                    fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
-                    setAuthView("signin");
-                  }}
-                />
-                <AuthOption
-                  icon={<UserPlus className="h-5 w-5" />}
-                  title="Criar conta"
-                  description="Sou novo(a) por aqui"
-                  onClick={() => {
-                    fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
-                    setAuthView("signup");
-                  }}
-                />
-                <AuthOption
-                  icon={<EyeOff className="h-5 w-5" />}
-                  title="Assinar de forma anônima"
-                  description="Sem cadastro, com privacidade"
-                  onClick={() => {
-                    fireInitiateCheckout(selectedPlan.label, Math.round(parsePrice(selectedPlan.price) * 100));
-                    setAuthView("anon");
-                  }}
-                />
-              </div>
-            </>
-          )}
-
-          {authView === "signin" && (
-            <AuthForm
-              fields={[
-                { name: "email", label: "Email/CPF", type: "text" },
-                { name: "password", label: "Senha", type: "password" },
-              ]}
-              submitLabel="Entrar"
-              onBack={() => setAuthView("menu")}
-              onSubmit={goCheckout}
-            />
-          )}
-
-          {authView === "signup" && (
-            <AuthForm
-              fields={[
-                { name: "name", label: "Nome completo", type: "text" },
-                { name: "cpf", label: "CPF", type: "text" },
-                { name: "email", label: "Email", type: "email" },
-                { name: "password", label: "Senha", type: "password" },
-              ]}
-              submitLabel="Criar conta e continuar"
-              onBack={() => setAuthView("menu")}
-              onSubmit={goCheckout}
-            />
-          )}
-
-          {authView === "anon" && (
-            <AuthForm
-              fields={[{ name: "email", label: "Email", type: "email" }]}
-              submitLabel="Continuar anonimamente"
-              onBack={() => setAuthView("menu")}
-              onSubmit={goCheckout}
-            />
-          )}
-
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={backOfferOpen} onOpenChange={setBackOfferOpen}>
         <DialogContent className="max-w-[360px] rounded-2xl p-6 bg-[oklch(0.985_0.005_60)] border-0">
@@ -701,7 +717,7 @@ function AuthForm({
             type={f.type}
             value={values[f.name] ?? ""}
             onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-            className="h-11 rounded-xl bg-background border border-border px-3 text-sm text-foreground outline-none focus:border-[oklch(0.78_0.17_45)]"
+            className="h-11 rounded-xl bg-background border border-border px-3 text-base text-foreground outline-none focus:border-[oklch(0.78_0.17_45)]"
           />
         </label>
       ))}
