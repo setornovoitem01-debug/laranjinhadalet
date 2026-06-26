@@ -10,6 +10,10 @@ import {
   BadgeCheck,
   Smartphone,
   ChevronUp,
+  MessageCircle,
+  DollarSign,
+  Bookmark,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useState } from "react";
 
