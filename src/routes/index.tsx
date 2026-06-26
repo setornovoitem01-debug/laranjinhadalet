@@ -332,7 +332,7 @@ function ProfilePage() {
           <p className="text-sm text-muted-foreground">@{HANDLE}</p>
 
           <p className="text-sm mt-3 leading-relaxed">
-            18 anos, estudante de Ed. Física. Conteúdo exclusivo e bate-papo diário com os assinantes 💬✨
+            Tenha 18 aninhos, Sou estudante de Ed. Física e garanto que vou ser aquela estudante que você sempre quis ver do melhor jeito possível, venha avaliar meu shape kkkk. Conteúdo exclusivo e bate-papo diário com os assinantes 💬✨
           </p>
         </div>
 
