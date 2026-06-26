@@ -60,18 +60,13 @@ function ProfilePage() {
     <div className="min-h-screen bg-background text-foreground flex justify-center">
       <div className="w-full max-w-[420px] min-h-screen bg-background relative pb-24">
         {/* Top bar */}
-        <header className="flex items-center justify-between px-4 pt-4 pb-3">
+        <header className="relative flex items-center justify-center px-4 pt-4 pb-3">
           <div className="text-2xl font-semibold tracking-tight">
             privacy<span className="text-[oklch(0.78_0.17_45)]">.</span>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="h-10 w-10 rounded-full bg-surface flex items-center justify-center border border-border">
-              <Compass className="h-5 w-5" />
-            </button>
-            <button className="h-10 w-10 rounded-full bg-surface flex items-center justify-center text-xs font-semibold border border-border">
-              GO
-            </button>
-          </div>
+          <button className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <Globe className="h-5 w-5" />
+          </button>
         </header>
 
         {/* Sub header */}
