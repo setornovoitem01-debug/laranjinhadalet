@@ -10,33 +10,44 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicYuvexpayWebhookRouteImport } from './routes/api/public/yuvexpay-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicYuvexpayWebhookRoute =
+  ApiPublicYuvexpayWebhookRouteImport.update({
+    id: '/api/public/yuvexpay-webhook',
+    path: '/api/public/yuvexpay-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/yuvexpay-webhook': typeof ApiPublicYuvexpayWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/yuvexpay-webhook': typeof ApiPublicYuvexpayWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/yuvexpay-webhook': typeof ApiPublicYuvexpayWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/public/yuvexpay-webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/public/yuvexpay-webhook'
+  id: '__root__' | '/' | '/api/public/yuvexpay-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicYuvexpayWebhookRoute: typeof ApiPublicYuvexpayWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +59,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/yuvexpay-webhook': {
+      id: '/api/public/yuvexpay-webhook'
+      path: '/api/public/yuvexpay-webhook'
+      fullPath: '/api/public/yuvexpay-webhook'
+      preLoaderRoute: typeof ApiPublicYuvexpayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicYuvexpayWebhookRoute: ApiPublicYuvexpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
