@@ -84,10 +84,10 @@ function ProfilePage() {
             <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full bg-[oklch(0.7_0.18_145)] border-2 border-background" />
           </div>
           <div className="flex items-center gap-4 pb-1 text-sm">
-            <Stat icon={<Images className="h-4 w-4" />} value="00" />
-            <Stat icon={<Film className="h-4 w-4" />} value="00" />
-            <Stat icon={<Lock className="h-4 w-4" />} value="00" />
-            <Stat icon={<Heart className="h-4 w-4" />} value="0" />
+            <Stat icon={<Images className="h-4 w-4" />} value="59" />
+            <Stat icon={<Film className="h-4 w-4" />} value="26" />
+            <Stat icon={<Lock className="h-4 w-4" />} value="10" />
+            <Stat icon={<Heart className="h-4 w-4" />} value="2.6K" />
           </div>
         </div>
 
