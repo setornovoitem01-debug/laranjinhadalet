@@ -16,6 +16,11 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useState } from "react";
+import profileAsset from "@/assets/profile.png.asset.json";
+
+const PROFILE_IMG = profileAsset.url;
+const DISPLAY_NAME = "leticia";
+const HANDLE = "lettvargas";
 
 export const Route = createFileRoute("/")({
   head: () => ({
