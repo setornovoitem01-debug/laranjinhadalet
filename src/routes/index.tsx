@@ -16,6 +16,11 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useState } from "react";
+import profileAsset from "@/assets/profile.png.asset.json";
+
+const PROFILE_IMG = profileAsset.url;
+const DISPLAY_NAME = "leticia";
+const HANDLE = "lettvargas";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -54,7 +59,7 @@ function ProfilePage() {
           <button className="h-8 w-8 flex items-center justify-center">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h1 className="text-base font-medium">usuario_demo</h1>
+          <h1 className="text-base font-medium">{DISPLAY_NAME}</h1>
           <button className="h-8 w-8 flex items-center justify-center">
             <MoreVertical className="h-5 w-5" />
           </button>
@@ -73,8 +78,8 @@ function ProfilePage() {
         {/* Avatar + stats */}
         <div className="px-4 -mt-10 relative flex items-end justify-between">
           <div className="relative">
-            <div className="h-20 w-20 rounded-full border-4 border-background bg-surface-2 overflow-hidden grid place-items-center">
-              <span className="text-2xl">👤</span>
+            <div className="h-20 w-20 rounded-full border-4 border-background bg-surface-2 overflow-hidden">
+              <img src={PROFILE_IMG} alt={DISPLAY_NAME} className="h-full w-full object-cover" />
             </div>
             <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full bg-[oklch(0.7_0.18_145)] border-2 border-background" />
           </div>
@@ -89,10 +94,10 @@ function ProfilePage() {
         {/* Identity */}
         <div className="px-4 mt-3">
           <div className="flex items-center gap-1.5">
-            <h2 className="text-xl font-semibold">usuario_demo</h2>
+            <h2 className="text-xl font-semibold">{DISPLAY_NAME}</h2>
             <BadgeCheck className="h-5 w-5 text-[oklch(0.7_0.15_220)] fill-[oklch(0.7_0.15_220)] text-background" />
           </div>
-          <p className="text-sm text-muted-foreground">@usuario_demo</p>
+          <p className="text-sm text-muted-foreground">@{HANDLE}</p>
 
           <p className="text-sm mt-3 leading-relaxed">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore...
@@ -157,15 +162,15 @@ function ProfilePage() {
           <article className="rounded-2xl bg-surface overflow-hidden border border-border">
             <div className="flex items-center justify-between px-3 py-3">
               <div className="flex items-center gap-2">
-                <div className="h-10 w-10 rounded-full bg-surface-2 grid place-items-center text-base">
-                  👤
+                <div className="h-10 w-10 rounded-full bg-surface-2 overflow-hidden">
+                  <img src={PROFILE_IMG} alt={DISPLAY_NAME} className="h-full w-full object-cover" />
                 </div>
                 <div className="leading-tight">
                   <div className="flex items-center gap-1">
-                    <span className="text-sm font-semibold">usuario_demo</span>
+                    <span className="text-sm font-semibold">{DISPLAY_NAME}</span>
                     <BadgeCheck className="h-4 w-4 text-[oklch(0.7_0.15_220)] fill-[oklch(0.7_0.15_220)] text-background" />
                   </div>
-                  <span className="text-xs text-muted-foreground">@usuario_demo</span>
+                  <span className="text-xs text-muted-foreground">@{HANDLE}</span>
                 </div>
               </div>
               <button className="h-8 w-8 grid place-items-center">
