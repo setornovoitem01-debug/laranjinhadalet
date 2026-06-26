@@ -162,15 +162,15 @@ function ProfilePage() {
           <article className="rounded-2xl bg-surface overflow-hidden border border-border">
             <div className="flex items-center justify-between px-3 py-3">
               <div className="flex items-center gap-2">
-                <div className="h-10 w-10 rounded-full bg-surface-2 grid place-items-center text-base">
-                  👤
+                <div className="h-10 w-10 rounded-full bg-surface-2 overflow-hidden">
+                  <img src={PROFILE_IMG} alt={DISPLAY_NAME} className="h-full w-full object-cover" />
                 </div>
                 <div className="leading-tight">
                   <div className="flex items-center gap-1">
-                    <span className="text-sm font-semibold">usuario_demo</span>
+                    <span className="text-sm font-semibold">{DISPLAY_NAME}</span>
                     <BadgeCheck className="h-4 w-4 text-[oklch(0.7_0.15_220)] fill-[oklch(0.7_0.15_220)] text-background" />
                   </div>
-                  <span className="text-xs text-muted-foreground">@usuario_demo</span>
+                  <span className="text-xs text-muted-foreground">@{HANDLE}</span>
                 </div>
               </div>
               <button className="h-8 w-8 grid place-items-center">
