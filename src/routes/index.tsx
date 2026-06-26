@@ -22,9 +22,11 @@ import {
   Copy,
 } from "lucide-react";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import profileAsset from "@/assets/profile.png.asset.json";
 import coverAsset from "@/assets/cover.png.asset.json";
+import { createPixPayment } from "@/lib/pix.functions";
 
 const PROFILE_IMG = profileAsset.url;
 const COVER_IMG = coverAsset.url;
@@ -51,14 +53,65 @@ function ProfilePage() {
     price: "R$ 15,99",
   });
   const [checkoutMode, setCheckoutMode] = useState(false);
+  const [pixLoading, setPixLoading] = useState(false);
+  const [pixError, setPixError] = useState<string | null>(null);
+  const [pixCode, setPixCode] = useState<string | null>(null);
+  const [pixQr, setPixQr] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const createPix = useServerFn(createPixPayment);
+
   const openAuth = (label: string, price: string) => {
     setSelectedPlan({ label, price });
     setAuthView("menu");
     setAuthOpen(true);
   };
-  const goCheckout = () => {
+
+  const parsePrice = (price: string) => {
+    const n = Number(price.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const goCheckout = async (values: Record<string, string>) => {
     setAuthOpen(false);
     setCheckoutMode(true);
+    setPixLoading(true);
+    setPixError(null);
+    setPixCode(null);
+    setPixQr(null);
+    try {
+      const amount = parsePrice(selectedPlan.price);
+      const res = await createPix({
+        data: {
+          amount,
+          description: `Assinatura ${selectedPlan.label} — @${HANDLE}`,
+          customerEmail: values.email || "anonimo@example.com",
+          customerName: values.name,
+          customerDocument: values.cpf,
+        },
+      });
+      if (!res.ok || !res.pixCopyPaste) {
+        setPixError(res.error || "Não foi possível gerar o Pix.");
+      } else {
+        setPixCode(res.pixCopyPaste);
+        setPixQr(res.qrCodeBase64 ?? null);
+      }
+    } catch (e) {
+      setPixError("Erro inesperado ao gerar o Pix.");
+    } finally {
+      setPixLoading(false);
+    }
+  };
+
+  const copyPix = async () => {
+    if (!pixCode) return;
+    try {
+      await navigator.clipboard.writeText(pixCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* noop */
+    }
   };
 
   return (
@@ -147,15 +200,31 @@ function ProfilePage() {
               <p className="text-xs text-muted-foreground">Valor</p>
               <p className="text-2xl font-semibold mt-1 mb-4">{selectedPlan.price}</p>
 
-              <div className="rounded-full border border-border bg-surface px-4 py-3 mb-4 overflow-hidden">
-                <p className="text-xs text-muted-foreground truncate font-mono">
-                  00020101021226640014br.gov.bcb.pix2542pix.m…
-                </p>
+              {pixQr && (
+                <div className="flex justify-center mb-4">
+                  <img src={pixQr} alt="QR Code Pix" className="h-44 w-44 rounded-xl border border-border bg-white p-2" />
+                </div>
+              )}
+
+              <div className="rounded-2xl border border-border bg-surface px-4 py-3 mb-4 overflow-hidden min-h-[48px] flex items-center">
+                {pixLoading ? (
+                  <p className="text-xs text-muted-foreground">Gerando código Pix…</p>
+                ) : pixError ? (
+                  <p className="text-xs text-destructive">{pixError}</p>
+                ) : pixCode ? (
+                  <p className="text-xs text-muted-foreground font-mono break-all line-clamp-2">{pixCode}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Aguardando…</p>
+                )}
               </div>
 
-              <button className="gradient-orange w-full rounded-full h-12 text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)] flex items-center justify-center gap-2">
-                <Copy className="h-4 w-4" />
-                Copiar chave Pix
+              <button
+                onClick={copyPix}
+                disabled={!pixCode}
+                className="gradient-orange w-full rounded-full h-12 text-brand-foreground font-medium shadow-[0_4px_20px_-8px_oklch(0.78_0.17_45/0.5)] flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? "Copiado!" : "Copiar chave Pix"}
               </button>
             </section>
           </>
@@ -380,7 +449,7 @@ function AuthForm({
   fields: AuthField[];
   submitLabel: string;
   onBack: () => void;
-  onSubmit: () => void;
+  onSubmit: (values: Record<string, string>) => void;
 }) {
   const [values, setValues] = useState<Record<string, string>>({});
   const allFilled = fields.every((f) => (values[f.name] ?? "").trim().length > 0);
@@ -389,7 +458,7 @@ function AuthForm({
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        if (allFilled) onSubmit();
+        if (allFilled) onSubmit(values);
       }}
       className="flex flex-col gap-3"
     >
