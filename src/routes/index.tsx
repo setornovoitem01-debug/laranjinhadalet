@@ -147,6 +147,61 @@ function ProfilePage() {
     }
   };
 
+  // Captura UTMs / src / sck da URL e persiste em localStorage (cross-page)
+  const TRACK_KEYS = ["src", "sck", "utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term"] as const;
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const url = new URL(window.location.href);
+      const existing = JSON.parse(localStorage.getItem("__tracking") || "{}") as Record<string, string>;
+      let changed = false;
+      for (const k of TRACK_KEYS) {
+        const v = url.searchParams.get(k);
+        if (v) {
+          existing[k] = v;
+          changed = true;
+        }
+      }
+      if (changed) localStorage.setItem("__tracking", JSON.stringify(existing));
+    } catch {
+      /* noop */
+    }
+  }, []);
+
+  const getTracking = (): Record<string, string | null> => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(localStorage.getItem("__tracking") || "{}") as Record<string, string | null>;
+    } catch {
+      return {};
+    }
+  };
+
+  // Best-effort: dispara um evento "InitiateCheckout" pra qualquer pixel escutando window/dataLayer.
+  // (Utmify só rastreia vendas via API; o evento abaixo é pra Pixel do Facebook caso seja instalado.)
+  const fireInitiateCheckout = (label: string, priceCents: number) => {
+    if (typeof window === "undefined") return;
+    const w = window as unknown as {
+      fbq?: (...args: unknown[]) => void;
+      dataLayer?: Array<Record<string, unknown>>;
+    };
+    try {
+      w.fbq?.("track", "InitiateCheckout", {
+        value: priceCents / 100,
+        currency: "BRL",
+        content_name: label,
+      });
+      (w.dataLayer ||= []).push({
+        event: "initiate_checkout",
+        content_name: label,
+        value: priceCents / 100,
+        currency: "BRL",
+      });
+    } catch {
+      /* noop */
+    }
+  };
+
   const openAuth = (label: string, price: string) => {
     setSelectedPlan({ label, price });
     setAuthView("menu");
