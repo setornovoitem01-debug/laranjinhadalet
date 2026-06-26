@@ -1,11 +1,23 @@
 import { createServerFn } from "@tanstack/react-start";
 
+type Tracking = {
+  src?: string | null;
+  sck?: string | null;
+  utm_source?: string | null;
+  utm_campaign?: string | null;
+  utm_medium?: string | null;
+  utm_content?: string | null;
+  utm_term?: string | null;
+};
+
 type CreatePixInput = {
   amount: number;
   description: string;
   customerEmail: string;
   customerName?: string;
   customerDocument?: string;
+  productId?: string;
+  tracking?: Tracking;
 };
 
 type CreatePixResult = {
@@ -31,6 +43,8 @@ export const createPixPayment = createServerFn({ method: "POST" })
       customerEmail: input.customerEmail.trim(),
       customerName: input.customerName?.trim() || "Cliente",
       customerDocument: input.customerDocument?.replace(/\D/g, "") || undefined,
+      productId: input.productId?.trim() || "subscription",
+      tracking: input.tracking ?? {},
     };
   })
   .handler(async ({ data }): Promise<CreatePixResult> => {
@@ -68,7 +82,15 @@ export const createPixPayment = createServerFn({ method: "POST" })
       });
 
       const json = (await res.json().catch(() => null)) as
-        | { payment?: { id?: string; expiresAt?: string; methodData?: { pixCopyPaste?: string; qrCodeBase64?: string } }; message?: string; error?: string }
+        | {
+            payment?: {
+              id?: string;
+              expiresAt?: string;
+              methodData?: { pixCopyPaste?: string; qrCodeBase64?: string };
+            };
+            message?: string;
+            error?: string;
+          }
         | null;
 
       if (!res.ok || !json?.payment?.methodData?.pixCopyPaste) {
@@ -79,9 +101,51 @@ export const createPixPayment = createServerFn({ method: "POST" })
         };
       }
 
+      const paymentId = json.payment.id || idempotencyKey;
+      const amountCents = Math.round(data.amount * 100);
+
+      // Persist + track as pending in Utmify (best-effort; never block the Pix response)
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin
+          .from("utmify_orders")
+          .upsert(
+            {
+              payment_id: paymentId,
+              amount_cents: amountCents,
+              customer: {
+                name: data.customerName,
+                email: data.customerEmail,
+                document: data.customerDocument ?? null,
+              },
+              product: { id: data.productId, name: data.description },
+              tracking: data.tracking,
+              status: "waiting_payment",
+            },
+            { onConflict: "payment_id" },
+          );
+
+        const { sendUtmifyOrder } = await import("./utmify.server");
+        await sendUtmifyOrder({
+          orderId: paymentId,
+          status: "waiting_payment",
+          createdAt: new Date(),
+          amountCents,
+          customer: {
+            name: data.customerName,
+            email: data.customerEmail,
+            document: data.customerDocument,
+          },
+          product: { id: data.productId, name: data.description },
+          tracking: data.tracking,
+        });
+      } catch (err) {
+        console.error("Utmify pending tracking failed", err);
+      }
+
       return {
         ok: true,
-        id: json.payment.id,
+        id: paymentId,
         pixCopyPaste: json.payment.methodData.pixCopyPaste,
         qrCodeBase64: json.payment.methodData.qrCodeBase64,
         expiresAt: json.payment.expiresAt,

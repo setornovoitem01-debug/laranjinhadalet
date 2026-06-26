@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      utmify_orders: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          customer: Json
+          paid_at: string | null
+          payment_id: string
+          product: Json
+          status: string
+          tracking: Json
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          customer: Json
+          paid_at?: string | null
+          payment_id: string
+          product: Json
+          status?: string
+          tracking: Json
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          customer?: Json
+          paid_at?: string | null
+          payment_id?: string
+          product?: Json
+          status?: string
+          tracking?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
