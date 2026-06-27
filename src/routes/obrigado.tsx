@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Mail, Video, Clock, Sparkles } from "lucide-react";
 import profileAsset from "@/assets/profile.png.asset.json";
 import profile2Url from "@/assets/profile2.png";
-import privacyLogoAsset from "@/assets/privacy-logo.png.asset.json";
+
 import { useServerFn } from "@tanstack/react-start";
 import { createPixPayment } from "@/lib/pix.functions";
 import { getPaymentStatus } from "@/lib/payment-status.functions";
@@ -145,9 +145,8 @@ function ObrigadoPage() {
   return (
     <div className="min-h-screen bg-white text-zinc-900">
       <div className="mx-auto max-w-md px-5 py-8">
-        {/* Privacy text logo (same as home) */}
         <header className="flex items-center justify-center pb-6">
-          <img src={privacyLogoAsset.url} alt="Privacy" className="h-12 w-auto object-contain" />
+          <span className="text-2xl font-semibold tracking-tight lowercase">privacy.</span>
         </header>
 
         <div
