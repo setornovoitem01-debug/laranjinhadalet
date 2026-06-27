@@ -43,6 +43,8 @@ function ObrigadoPage() {
   const [declined2, setDeclined2] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [pixStartedAt, setPixStartedAt] = useState<number | null>(null);
+  const [pixStartedAt2, setPixStartedAt2] = useState<number | null>(null);
 
   useEffect(() => {
     if (!paymentId) return;
@@ -86,6 +88,7 @@ function ObrigadoPage() {
         },
       });
       setPixCode(res.pixCopyPaste ?? null);
+      setPixStartedAt(Date.now());
       setPixQr(res.qrCodeBase64 ?? null);
       if (res.id) setPaymentId(res.id);
     } catch (e) {
@@ -108,6 +111,7 @@ function ObrigadoPage() {
         },
       });
       setPixCode2(res.pixCopyPaste ?? null);
+      setPixStartedAt2(Date.now());
       setPixQr2(res.qrCodeBase64 ?? null);
       if (res.id) setPaymentId(res.id);
     } catch (e) {
@@ -143,9 +147,7 @@ function ObrigadoPage() {
       <div className="mx-auto max-w-md px-5 py-8">
         {/* Privacy text logo (same as home) */}
         <header className="flex items-center justify-center pb-6">
-          <span className="text-3xl font-semibold tracking-tight text-zinc-900">
-            privacy<span style={{ color: ACCENT }}>.</span>
-          </span>
+          <img src={privacyLogoAsset.url} alt="Privacy" className="h-12 w-auto object-contain" />
         </header>
 
         <div
