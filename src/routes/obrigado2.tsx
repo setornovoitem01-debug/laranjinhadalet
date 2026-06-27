@@ -2,8 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, MessageCircle, Phone, ShieldCheck, Plane } from "lucide-react";
 import profileAsset from "@/assets/profile.png.asset.json";
+import privacyLogoAsset from "@/assets/privacy-logo.png.asset.json";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixPayment } from "@/lib/pix.functions";
+import { PixPaymentBlock } from "@/components/PixPaymentBlock";
 
 export const Route = createFileRoute("/obrigado2")({
   head: () => ({
