@@ -284,6 +284,7 @@ function ProfilePage() {
       } else {
         setPixCode(res.pixCopyPaste);
         setPixQr(res.qrCodeBase64 ?? null);
+        if (res.id) setPaymentId(res.id);
       }
     } catch (e) {
       setPixError("Erro inesperado ao gerar o Pix.");
