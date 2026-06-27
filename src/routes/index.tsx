@@ -703,6 +703,7 @@ function ProfilePage() {
       </Dialog>
 
     </div>
+    </>
   );
 }
 
