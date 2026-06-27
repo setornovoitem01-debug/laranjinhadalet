@@ -38,7 +38,7 @@ const HANDLE = "lettvargas";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Perfil — Demo" },
+      { title: "@lettvargas" },
       { name: "description", content: "Página de perfil de demonstração." },
     ],
   }),
