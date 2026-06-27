@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createHmac, timingSafeEqual } from "crypto";
 
 type PaymentLike = {
   id?: string;
@@ -22,13 +21,31 @@ type WebhookPayload = {
 
 const SKEW_SECONDS = 300;
 
-function safeEqual(a: string, b: string) {
-  const left = Buffer.from(a);
-  const right = Buffer.from(b);
-  return left.length === right.length && timingSafeEqual(left, right);
+function constantTimeEqual(a: string, b: string) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i += 1) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
 }
 
-function verifySignature(rawBody: string, headers: Headers, secret: string) {
+async function hmacSha256Hex(secret: string, value: string) {
+  const encoder = new TextEncoder();
+  const key = await globalThis.crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = await globalThis.crypto.subtle.sign("HMAC", key, encoder.encode(value));
+  return Array.from(new Uint8Array(signature))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function verifySignature(rawBody: string, headers: Headers, secret: string) {
   const timestamp = headers.get("x-webhook-timestamp");
   const signature = headers.get("x-webhook-signature");
   const legacySignature = headers.get("x-webhook-signature-legacy");
@@ -37,14 +54,13 @@ function verifySignature(rawBody: string, headers: Headers, secret: string) {
     const drift = Math.abs(Math.floor(Date.now() / 1000) - Number.parseInt(timestamp, 10));
     if (!Number.isFinite(drift) || drift > SKEW_SECONDS) return false;
 
-    const expected =
-      "v1=" + createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
-    if (safeEqual(signature, expected)) return true;
+    const expected = "v1=" + (await hmacSha256Hex(secret, `${timestamp}.${rawBody}`));
+    if (constantTimeEqual(signature, expected)) return true;
   }
 
   if (legacySignature) {
-    const expectedLegacy = createHmac("sha256", secret).update(rawBody).digest("hex");
-    return safeEqual(legacySignature.replace(/^v1=/, ""), expectedLegacy);
+    const expectedLegacy = await hmacSha256Hex(secret, rawBody);
+    return constantTimeEqual(legacySignature.replace(/^v1=/, ""), expectedLegacy);
   }
 
   return false;
@@ -109,7 +125,7 @@ export const Route = createFileRoute("/api/public/yuvexpay-webhook")({
 
         const rawBody = await request.text();
         const hasValidToken = token === expected;
-        const hasValidSignature = verifySignature(rawBody, request.headers, expected);
+        const hasValidSignature = await verifySignature(rawBody, request.headers, expected);
         if (!hasValidToken && !hasValidSignature) {
           return new Response("Unauthorized", { status: 401 });
         }
