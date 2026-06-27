@@ -104,6 +104,7 @@ function Obrigado2Page() {
       });
       setPixCode(res.pixCopyPaste ?? null);
       setPixQr(res.qrCodeBase64 ?? null);
+      setPixStartedAt(Date.now());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
     } finally {
