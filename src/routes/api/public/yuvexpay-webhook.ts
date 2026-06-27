@@ -1,17 +1,96 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createHmac, timingSafeEqual } from "crypto";
 
 type PaymentLike = {
   id?: string;
   paymentId?: string;
+  payment_id?: string;
+  externalId?: string;
+  external_id?: string;
+  paidAt?: string;
+  paid_at?: string;
   status?: string;
 };
 
 type WebhookPayload = {
+  id?: string;
   event?: string;
   type?: string;
   payment?: PaymentLike;
   data?: ({ payment?: PaymentLike } & PaymentLike) | PaymentLike;
 } & PaymentLike;
+
+const SKEW_SECONDS = 300;
+
+function safeEqual(a: string, b: string) {
+  const left = Buffer.from(a);
+  const right = Buffer.from(b);
+  return left.length === right.length && timingSafeEqual(left, right);
+}
+
+function verifySignature(rawBody: string, headers: Headers, secret: string) {
+  const timestamp = headers.get("x-webhook-timestamp");
+  const signature = headers.get("x-webhook-signature");
+  const legacySignature = headers.get("x-webhook-signature-legacy");
+
+  if (timestamp && signature) {
+    const drift = Math.abs(Math.floor(Date.now() / 1000) - Number.parseInt(timestamp, 10));
+    if (!Number.isFinite(drift) || drift > SKEW_SECONDS) return false;
+
+    const expected =
+      "v1=" + createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
+    if (safeEqual(signature, expected)) return true;
+  }
+
+  if (legacySignature) {
+    const expectedLegacy = createHmac("sha256", secret).update(rawBody).digest("hex");
+    return safeEqual(legacySignature.replace(/^v1=/, ""), expectedLegacy);
+  }
+
+  return false;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function firstString(source: unknown, keys: string[]) {
+  const record = asRecord(source);
+  if (!record) return undefined;
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return undefined;
+}
+
+function extractPaymentId(payload: WebhookPayload) {
+  const data = asRecord(payload.data);
+  const candidates = [
+    payload.payment,
+    data?.payment,
+    data?.object,
+    data?.paymentData,
+    data,
+    payload,
+  ];
+
+  for (const candidate of candidates) {
+    const id = firstString(candidate, ["id", "paymentId", "payment_id"]);
+    if (id && !id.startsWith("evt_")) return id;
+  }
+
+  return firstString(payload, ["paymentId", "payment_id"]);
+}
+
+function extractPaidAt(payload: WebhookPayload) {
+  const data = asRecord(payload.data);
+  const paidAt = firstString(data, ["paidAt", "paid_at", "approvedAt", "approved_at"]);
+  const parsed = paidAt ? new Date(paidAt) : null;
+  return parsed && !Number.isNaN(parsed.getTime()) ? parsed : new Date();
+}
 
 export const Route = createFileRoute("/api/public/yuvexpay-webhook")({
   server: {
@@ -27,13 +106,17 @@ export const Route = createFileRoute("/api/public/yuvexpay-webhook")({
           url.searchParams.get("token") ||
           request.headers.get("x-webhook-token") ||
           request.headers.get("x-webhook-secret");
-        if (token !== expected) {
+
+        const rawBody = await request.text();
+        const hasValidToken = token === expected;
+        const hasValidSignature = verifySignature(rawBody, request.headers, expected);
+        if (!hasValidToken && !hasValidSignature) {
           return new Response("Unauthorized", { status: 401 });
         }
 
         let payload: WebhookPayload;
         try {
-          payload = (await request.json()) as WebhookPayload;
+          payload = JSON.parse(rawBody) as WebhookPayload;
         } catch {
           return new Response("Bad JSON", { status: 400 });
         }
@@ -41,12 +124,20 @@ export const Route = createFileRoute("/api/public/yuvexpay-webhook")({
         const dataField = (payload?.data ?? {}) as { payment?: PaymentLike } & PaymentLike;
         const payment: PaymentLike =
           payload?.payment ?? dataField.payment ?? dataField ?? payload ?? {};
-        const paymentId = payment?.id || payment?.paymentId;
-        const eventStr = (payload?.event || payload?.type || "").toString().toUpperCase();
+        const paymentId = extractPaymentId(payload);
+        const eventStr = (
+          request.headers.get("x-webhook-event") ||
+          payload?.event ||
+          payload?.type ||
+          ""
+        )
+          .toString()
+          .toUpperCase();
         const statusStr = (payment?.status || "").toString().toUpperCase();
         const combined = `${eventStr} ${statusStr}`;
 
         if (!paymentId) {
+          console.error("YuvexPay webhook missing payment id", rawBody.slice(0, 500));
           return new Response("Missing payment id", { status: 400 });
         }
 
@@ -75,9 +166,10 @@ export const Route = createFileRoute("/api/public/yuvexpay-webhook")({
           return new Response("already processed", { status: 200 });
         }
 
+        const approvedAt = extractPaidAt(payload);
         await supabaseAdmin
           .from("utmify_orders")
-          .update({ status: "paid", paid_at: new Date().toISOString() })
+          .update({ status: "paid", paid_at: approvedAt.toISOString() })
           .eq("payment_id", paymentId);
 
         const { sendUtmifyOrder } = await import("@/lib/utmify.server");
@@ -85,12 +177,13 @@ export const Route = createFileRoute("/api/public/yuvexpay-webhook")({
           orderId: paymentId,
           status: "paid",
           createdAt: new Date(row.created_at as string),
-          approvedAt: new Date(),
+          approvedAt,
           amountCents: row.amount_cents as number,
           customer: row.customer as {
             name: string;
             email: string;
             document?: string | null;
+            ip?: string | null;
           },
           product: row.product as { id: string; name: string },
           tracking: row.tracking as Record<string, string | null>,
