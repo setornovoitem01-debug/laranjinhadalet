@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Mail, Video, Clock, Sparkles } from "lucide-react";
 import profileAsset from "@/assets/profile.png.asset.json";
 import profile2Url from "@/assets/profile2.png";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixPayment } from "@/lib/pix.functions";
+import { getPaymentStatus } from "@/lib/payment-status.functions";
 
 export const Route = createFileRoute("/obrigado")({
   head: () => ({
@@ -23,6 +24,7 @@ const UPSELL2_AMOUNT = 9.9;
 
 function ObrigadoPage() {
   const createPix = useServerFn(createPixPayment);
+  const checkStatus = useServerFn(getPaymentStatus);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +40,27 @@ function ObrigadoPage() {
   const [copied2, setCopied2] = useState(false);
   const [declined2, setDeclined2] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!paymentId) return;
+    let cancelled = false;
+    const tick = async () => {
+      try {
+        const r = await checkStatus({ data: { paymentId } });
+        if (cancelled) return;
+        if (r.status === "paid") navigate({ to: "/obrigado2" });
+      } catch {
+        /* noop */
+      }
+    };
+    tick();
+    const id = setInterval(tick, 4000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [paymentId, checkStatus, navigate]);
 
   function goToStep2() {
     setTransitioning(true);
@@ -81,14 +104,31 @@ function ObrigadoPage() {
           customerName: "Cliente",
         },
       });
-      setPixCode2(res.pixCopyPaste ?? null);
-      setPixQr2(res.qrCodeBase64 ?? null);
+      setPixCode(res.pixCopyPaste ?? null);
+      setPixQr(res.qrCodeBase64 ?? null);
+      if (res.id) setPaymentId(res.id);
     } catch (e) {
-      setError2(e instanceof Error ? e.message : "Erro ao gerar PIX");
+      setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
     } finally {
-      setLoading2(false);
+      setLoading(false);
     }
   }
+
+  async function handleUpsell2() {
+    setLoading2(true);
+    setError2(null);
+    try {
+      const res = await createPix({
+        data: {
+          amount: UPSELL2_AMOUNT,
+          description: "Chamada exclusiva 15min com Leticia + irmã",
+          customerEmail: "cliente@privacy.com",
+          customerName: "Cliente",
+        },
+      });
+      setPixCode2(res.pixCopyPaste ?? null);
+      setPixQr2(res.qrCodeBase64 ?? null);
+      if (res.id) setPaymentId(res.id);
 
   async function copyCode() {
     if (!pixCode) return;
