@@ -348,20 +348,8 @@ function ObrigadoPage() {
 
           {error2 && <p className="mt-3 text-sm text-red-500">{error2}</p>}
 
-          {pixCode2 && (
-            <div className="mt-5 rounded-xl bg-zinc-50 border border-zinc-200 p-4">
-              <p className="mt-3 text-xs text-zinc-500 text-center">PIX Copia e Cola</p>
-              <div className="mt-2 rounded-md bg-white border border-zinc-200 p-2 text-[11px] break-all text-zinc-700 max-h-24 overflow-auto">
-                {pixCode2}
-              </div>
-              <button
-                onClick={copyCode2}
-                className="mt-3 w-full rounded-lg font-semibold py-2.5 text-sm text-white"
-                style={{ background: ACCENT }}
-              >
-                {copied2 ? "Copiado!" : "Copiar código PIX"}
-              </button>
-            </div>
+          {pixCode2 && pixStartedAt2 && (
+            <PixPaymentBlock code={pixCode2} startedAt={pixStartedAt2} />
           )}
         </div>
         </div>
