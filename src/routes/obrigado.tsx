@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Mail, Video, Clock, Sparkles } from "lucide-react";
 import profileAsset from "@/assets/profile.png.asset.json";
 import profile2Url from "@/assets/profile2.png";
+import privacyLogoAsset from "@/assets/privacy-logo.png.asset.json";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixPayment } from "@/lib/pix.functions";
 import { getPaymentStatus } from "@/lib/payment-status.functions";
+import { PixPaymentBlock } from "@/components/PixPaymentBlock";
 
 export const Route = createFileRoute("/obrigado")({
   head: () => ({
