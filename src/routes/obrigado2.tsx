@@ -125,9 +125,7 @@ function Obrigado2Page() {
     <div className="min-h-screen bg-white text-zinc-900">
       <div className="mx-auto max-w-md px-5 py-8">
         <header className="flex items-center justify-center pb-6">
-          <span className="text-3xl font-semibold tracking-tight text-zinc-900">
-            privacy<span style={{ color: ACCENT }}>.</span>
-          </span>
+          <img src={privacyLogoAsset.url} alt="Privacy" className="h-12 w-auto object-contain" />
         </header>
 
         {/* Profile + agradecimento */}
