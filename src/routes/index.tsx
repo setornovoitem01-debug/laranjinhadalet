@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   MoreVertical,
@@ -28,6 +28,7 @@ import profileAsset from "@/assets/profile.png.asset.json";
 import coverAsset from "@/assets/cover.png.asset.json";
 import privacyLogoAsset from "@/assets/privacy-logo.png.asset.json";
 import { createPixPayment } from "@/lib/pix.functions";
+import { getPaymentStatus } from "@/lib/payment-status.functions";
 
 
 const PROFILE_IMG = profileAsset.url;
@@ -68,8 +69,33 @@ function ProfilePage() {
   const [pixCode, setPixCode] = useState<string | null>(null);
   const [pixQr, setPixQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
+  const navigate = useNavigate();
   const createPix = useServerFn(createPixPayment);
+  const checkStatus = useServerFn(getPaymentStatus);
+
+  useEffect(() => {
+    if (!paymentId) return;
+    let cancelled = false;
+    const tick = async () => {
+      try {
+        const r = await checkStatus({ data: { paymentId } });
+        if (cancelled) return;
+        if (r.status === "paid") {
+          navigate({ to: "/obrigado" });
+        }
+      } catch {
+        /* noop */
+      }
+    };
+    tick();
+    const id = setInterval(tick, 4000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [paymentId, checkStatus, navigate]);
 
   // Back-redirect / oferta especial
   const customerRef = useRef<Record<string, string>>({});
@@ -140,6 +166,7 @@ function ProfilePage() {
         setOfferPixError(res.error || "Não foi possível gerar o Pix.");
       } else {
         setOfferPixCode(res.pixCopyPaste);
+        if (res.id) setPaymentId(res.id);
       }
     } catch {
       setOfferPixError("Erro inesperado ao gerar o Pix.");
@@ -257,6 +284,7 @@ function ProfilePage() {
       } else {
         setPixCode(res.pixCopyPaste);
         setPixQr(res.qrCodeBase64 ?? null);
+        if (res.id) setPaymentId(res.id);
       }
     } catch (e) {
       setPixError("Erro inesperado ao gerar o Pix.");
