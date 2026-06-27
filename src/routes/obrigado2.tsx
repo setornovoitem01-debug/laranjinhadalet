@@ -42,6 +42,7 @@ function Obrigado2Page() {
   const [pixQr, setPixQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [declined, setDeclined] = useState(false);
+  const [pixStartedAt, setPixStartedAt] = useState<number | null>(null);
 
   // GPS — detecta a cidade silenciosamente para usar no texto do upsell
   useEffect(() => {
