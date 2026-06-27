@@ -26,7 +26,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import profileAsset from "@/assets/profile.png.asset.json";
 import coverAsset from "@/assets/cover.png.asset.json";
+import privacyLogoAsset from "@/assets/privacy-logo.png.asset.json";
 import { createPixPayment } from "@/lib/pix.functions";
+
 
 const PROFILE_IMG = profileAsset.url;
 const COVER_IMG = coverAsset.url;
@@ -44,6 +46,14 @@ export const Route = createFileRoute("/")({
 });
 
 function ProfilePage() {
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined" && localStorage.getItem("ageConfirmed") === "1") {
+        setAgeConfirmed(true);
+      }
+    } catch {}
+  }, []);
   const [promosOpen, setPromosOpen] = useState(true);
   const [tab, setTab] = useState<"posts" | "media">("posts");
   const [authOpen, setAuthOpen] = useState(false);
@@ -267,7 +277,42 @@ function ProfilePage() {
   };
 
   return (
+    <>
+      {!ageConfirmed && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-6" style={{ background: "#f5ede0" }}>
+          <div className="w-full max-w-sm flex flex-col items-center text-center">
+            <img src={privacyLogoAsset.url} alt="Privacy" className="w-40 h-40 object-contain mb-6" />
+            <h1 className="text-3xl font-semibold tracking-tight" style={{ color: "#1a1a1a" }}>
+              privacy<span style={{ color: "#e85d3a" }}>.</span>
+            </h1>
+            <p className="mt-4 text-base" style={{ color: "#3a3a3a" }}>
+              Este site contém conteúdo adulto. Você precisa ter <strong>18 anos ou mais</strong> para continuar.
+            </p>
+            <p className="mt-2 text-sm" style={{ color: "#6b6b6b" }}>
+              Ao entrar, você confirma que é maior de idade.
+            </p>
+            <button
+              onClick={() => {
+                try { localStorage.setItem("ageConfirmed", "1"); } catch {}
+                setAgeConfirmed(true);
+              }}
+              className="mt-8 w-full rounded-full py-4 text-base font-semibold text-white shadow-lg transition-transform active:scale-[0.98]"
+              style={{ background: "linear-gradient(135deg, #f7931e 0%, #e85d3a 100%)" }}
+            >
+              Sou maior de 18 anos
+            </button>
+            <button
+              onClick={() => { window.location.href = "https://www.google.com"; }}
+              className="mt-3 text-sm underline"
+              style={{ color: "#6b6b6b" }}
+            >
+              Sair
+            </button>
+          </div>
+        </div>
+      )}
     <div className="min-h-screen bg-background text-foreground flex justify-center">
+
       <div className="w-full max-w-[420px] min-h-screen bg-background relative pb-24">
         {/* Top bar */}
         <header className="relative flex items-center justify-center px-4 pt-4 pb-3">
@@ -658,6 +703,7 @@ function ProfilePage() {
       </Dialog>
 
     </div>
+    </>
   );
 }
 
