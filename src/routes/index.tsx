@@ -166,6 +166,7 @@ function ProfilePage() {
         setOfferPixError(res.error || "Não foi possível gerar o Pix.");
       } else {
         setOfferPixCode(res.pixCopyPaste);
+        if (res.id) setPaymentId(res.id);
       }
     } catch {
       setOfferPixError("Erro inesperado ao gerar o Pix.");
