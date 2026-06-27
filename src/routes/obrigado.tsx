@@ -85,27 +85,6 @@ function ObrigadoPage() {
       });
       setPixCode(res.pixCopyPaste ?? null);
       setPixQr(res.qrCodeBase64 ?? null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleUpsell2() {
-    setLoading2(true);
-    setError2(null);
-    try {
-      const res = await createPix({
-        data: {
-          amount: UPSELL2_AMOUNT,
-          description: "Chamada exclusiva 15min com Leticia + irmã",
-          customerEmail: "cliente@privacy.com",
-          customerName: "Cliente",
-        },
-      });
-      setPixCode(res.pixCopyPaste ?? null);
-      setPixQr(res.qrCodeBase64 ?? null);
       if (res.id) setPaymentId(res.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
@@ -129,6 +108,13 @@ function ObrigadoPage() {
       setPixCode2(res.pixCopyPaste ?? null);
       setPixQr2(res.qrCodeBase64 ?? null);
       if (res.id) setPaymentId(res.id);
+    } catch (e) {
+      setError2(e instanceof Error ? e.message : "Erro ao gerar PIX");
+    } finally {
+      setLoading2(false);
+    }
+  }
+
 
   async function copyCode() {
     if (!pixCode) return;
