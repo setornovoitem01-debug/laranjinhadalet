@@ -358,13 +358,6 @@ function ObrigadoPage() {
 
           {pixCode2 && (
             <div className="mt-5 rounded-xl bg-zinc-50 border border-zinc-200 p-4">
-              {pixQr2 && (
-                <img
-                  src={pixQr2.startsWith("data:") ? pixQr2 : `data:image/png;base64,${pixQr2}`}
-                  alt="QR Code PIX"
-                  className="mx-auto w-48 h-48 rounded-lg bg-white p-2 border border-zinc-200"
-                />
-              )}
               <p className="mt-3 text-xs text-zinc-500 text-center">PIX Copia e Cola</p>
               <div className="mt-2 rounded-md bg-white border border-zinc-200 p-2 text-[11px] break-all text-zinc-700 max-h-24 overflow-auto">
                 {pixCode2}
