@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Mail, Video, Clock, Sparkles } from "lucide-react";
 import profileAsset from "@/assets/profile.png.asset.json";
 import profile2Url from "@/assets/profile2.png";
+import privacyLogoAsset from "@/assets/privacy-logo.png.asset.json";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixPayment } from "@/lib/pix.functions";
 import { getPaymentStatus } from "@/lib/payment-status.functions";
+import { PixPaymentBlock } from "@/components/PixPaymentBlock";
 
 export const Route = createFileRoute("/obrigado")({
   head: () => ({
@@ -41,6 +43,8 @@ function ObrigadoPage() {
   const [declined2, setDeclined2] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [pixStartedAt, setPixStartedAt] = useState<number | null>(null);
+  const [pixStartedAt2, setPixStartedAt2] = useState<number | null>(null);
 
   useEffect(() => {
     if (!paymentId) return;
@@ -84,6 +88,7 @@ function ObrigadoPage() {
         },
       });
       setPixCode(res.pixCopyPaste ?? null);
+      setPixStartedAt(Date.now());
       setPixQr(res.qrCodeBase64 ?? null);
       if (res.id) setPaymentId(res.id);
     } catch (e) {
@@ -106,6 +111,7 @@ function ObrigadoPage() {
         },
       });
       setPixCode2(res.pixCopyPaste ?? null);
+      setPixStartedAt2(Date.now());
       setPixQr2(res.qrCodeBase64 ?? null);
       if (res.id) setPaymentId(res.id);
     } catch (e) {
@@ -141,9 +147,7 @@ function ObrigadoPage() {
       <div className="mx-auto max-w-md px-5 py-8">
         {/* Privacy text logo (same as home) */}
         <header className="flex items-center justify-center pb-6">
-          <span className="text-3xl font-semibold tracking-tight text-zinc-900">
-            privacy<span style={{ color: ACCENT }}>.</span>
-          </span>
+          <img src={privacyLogoAsset.url} alt="Privacy" className="h-12 w-auto object-contain" />
         </header>
 
         <div
@@ -240,20 +244,8 @@ function ObrigadoPage() {
 
           {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
 
-          {pixCode && (
-            <div className="mt-5 rounded-xl bg-zinc-50 border border-zinc-200 p-4">
-              <p className="mt-3 text-xs text-zinc-500 text-center">PIX Copia e Cola</p>
-              <div className="mt-2 rounded-md bg-white border border-zinc-200 p-2 text-[11px] break-all text-zinc-700 max-h-24 overflow-auto">
-                {pixCode}
-              </div>
-              <button
-                onClick={copyCode}
-                className="mt-3 w-full rounded-lg font-semibold py-2.5 text-sm text-white"
-                style={{ background: ACCENT }}
-              >
-                {copied ? "Copiado!" : "Copiar código PIX"}
-              </button>
-            </div>
+          {pixCode && pixStartedAt && (
+            <PixPaymentBlock code={pixCode} startedAt={pixStartedAt} />
           )}
         </div>
         </>
@@ -356,20 +348,8 @@ function ObrigadoPage() {
 
           {error2 && <p className="mt-3 text-sm text-red-500">{error2}</p>}
 
-          {pixCode2 && (
-            <div className="mt-5 rounded-xl bg-zinc-50 border border-zinc-200 p-4">
-              <p className="mt-3 text-xs text-zinc-500 text-center">PIX Copia e Cola</p>
-              <div className="mt-2 rounded-md bg-white border border-zinc-200 p-2 text-[11px] break-all text-zinc-700 max-h-24 overflow-auto">
-                {pixCode2}
-              </div>
-              <button
-                onClick={copyCode2}
-                className="mt-3 w-full rounded-lg font-semibold py-2.5 text-sm text-white"
-                style={{ background: ACCENT }}
-              >
-                {copied2 ? "Copiado!" : "Copiar código PIX"}
-              </button>
-            </div>
+          {pixCode2 && pixStartedAt2 && (
+            <PixPaymentBlock code={pixCode2} startedAt={pixStartedAt2} />
           )}
         </div>
         </div>

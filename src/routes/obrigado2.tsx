@@ -2,8 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, MessageCircle, Phone, ShieldCheck, Plane } from "lucide-react";
 import profileAsset from "@/assets/profile.png.asset.json";
+import privacyLogoAsset from "@/assets/privacy-logo.png.asset.json";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixPayment } from "@/lib/pix.functions";
+import { PixPaymentBlock } from "@/components/PixPaymentBlock";
 
 export const Route = createFileRoute("/obrigado2")({
   head: () => ({
@@ -40,6 +42,7 @@ function Obrigado2Page() {
   const [pixQr, setPixQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [declined, setDeclined] = useState(false);
+  const [pixStartedAt, setPixStartedAt] = useState<number | null>(null);
 
   // GPS — detecta a cidade silenciosamente para usar no texto do upsell
   useEffect(() => {
@@ -101,6 +104,7 @@ function Obrigado2Page() {
       });
       setPixCode(res.pixCopyPaste ?? null);
       setPixQr(res.qrCodeBase64 ?? null);
+      setPixStartedAt(Date.now());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
     } finally {
@@ -121,9 +125,7 @@ function Obrigado2Page() {
     <div className="min-h-screen bg-white text-zinc-900">
       <div className="mx-auto max-w-md px-5 py-8">
         <header className="flex items-center justify-center pb-6">
-          <span className="text-3xl font-semibold tracking-tight text-zinc-900">
-            privacy<span style={{ color: ACCENT }}>.</span>
-          </span>
+          <img src={privacyLogoAsset.url} alt="Privacy" className="h-12 w-auto object-contain" />
         </header>
 
         {/* Profile + agradecimento */}
@@ -303,20 +305,8 @@ function Obrigado2Page() {
 
               {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
 
-              {pixCode && (
-                <div className="mt-5 rounded-xl bg-zinc-50 border border-zinc-200 p-4">
-                  <p className="mt-3 text-xs text-zinc-500 text-center">PIX Copia e Cola</p>
-                  <div className="mt-2 rounded-md bg-white border border-zinc-200 p-2 text-[11px] break-all text-zinc-700 max-h-24 overflow-auto">
-                    {pixCode}
-                  </div>
-                  <button
-                    onClick={copyCode}
-                    className="mt-3 w-full rounded-lg font-semibold py-2.5 text-sm text-white"
-                    style={{ background: ACCENT }}
-                  >
-                    {copied ? "Copiado!" : "Copiar código PIX"}
-                  </button>
-                </div>
+              {pixCode && pixStartedAt && (
+                <PixPaymentBlock code={pixCode} startedAt={pixStartedAt} />
               )}
             </div>
           </div>
