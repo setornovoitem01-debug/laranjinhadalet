@@ -9,9 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Obrigado2RouteImport } from './routes/obrigado2'
+import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as FinalRouteImport } from './routes/final'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicYuvexpayWebhookRouteImport } from './routes/api/public/yuvexpay-webhook'
 
+const Obrigado2Route = Obrigado2RouteImport.update({
+  id: '/obrigado2',
+  path: '/obrigado2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObrigadoRoute = ObrigadoRouteImport.update({
+  id: '/obrigado',
+  path: '/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinalRoute = FinalRouteImport.update({
+  id: '/final',
+  path: '/final',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -26,32 +44,81 @@ const ApiPublicYuvexpayWebhookRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/final': typeof FinalRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/obrigado2': typeof Obrigado2Route
   '/api/public/yuvexpay-webhook': typeof ApiPublicYuvexpayWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/final': typeof FinalRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/obrigado2': typeof Obrigado2Route
   '/api/public/yuvexpay-webhook': typeof ApiPublicYuvexpayWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/final': typeof FinalRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/obrigado2': typeof Obrigado2Route
   '/api/public/yuvexpay-webhook': typeof ApiPublicYuvexpayWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/yuvexpay-webhook'
+  fullPaths:
+    | '/'
+    | '/final'
+    | '/obrigado'
+    | '/obrigado2'
+    | '/api/public/yuvexpay-webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/yuvexpay-webhook'
-  id: '__root__' | '/' | '/api/public/yuvexpay-webhook'
+  to:
+    | '/'
+    | '/final'
+    | '/obrigado'
+    | '/obrigado2'
+    | '/api/public/yuvexpay-webhook'
+  id:
+    | '__root__'
+    | '/'
+    | '/final'
+    | '/obrigado'
+    | '/obrigado2'
+    | '/api/public/yuvexpay-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FinalRoute: typeof FinalRoute
+  ObrigadoRoute: typeof ObrigadoRoute
+  Obrigado2Route: typeof Obrigado2Route
   ApiPublicYuvexpayWebhookRoute: typeof ApiPublicYuvexpayWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/obrigado2': {
+      id: '/obrigado2'
+      path: '/obrigado2'
+      fullPath: '/obrigado2'
+      preLoaderRoute: typeof Obrigado2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/obrigado': {
+      id: '/obrigado'
+      path: '/obrigado'
+      fullPath: '/obrigado'
+      preLoaderRoute: typeof ObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/final': {
+      id: '/final'
+      path: '/final'
+      fullPath: '/final'
+      preLoaderRoute: typeof FinalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -71,6 +138,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FinalRoute: FinalRoute,
+  ObrigadoRoute: ObrigadoRoute,
+  Obrigado2Route: Obrigado2Route,
   ApiPublicYuvexpayWebhookRoute: ApiPublicYuvexpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
