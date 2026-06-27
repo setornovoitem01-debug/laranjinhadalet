@@ -133,6 +133,17 @@ export const createPixPayment = createServerFn({ method: "POST" })
       const paymentId = json.payment.id || idempotencyKey;
       const amountCents = Math.round(data.amount * 100);
 
+      let customerIp: string | null = null;
+      try {
+        customerIp =
+          getRequestHeader("cf-connecting-ip") ||
+          getRequestHeader("x-real-ip") ||
+          getRequestIP({ xForwardedFor: true }) ||
+          null;
+      } catch {
+        customerIp = null;
+      }
+
       // Persist + track as pending in Utmify (best-effort; never block the Pix response)
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -146,6 +157,7 @@ export const createPixPayment = createServerFn({ method: "POST" })
                 name: data.customerName,
                 email: data.customerEmail,
                 document: data.customerDocument ?? null,
+                ip: customerIp,
               },
               product: { id: data.productId, name: data.description },
               tracking: data.tracking,
@@ -164,6 +176,7 @@ export const createPixPayment = createServerFn({ method: "POST" })
             name: data.customerName,
             email: data.customerEmail,
             document: data.customerDocument,
+            ip: customerIp,
           },
           product: { id: data.productId, name: data.description },
           tracking: data.tracking,
