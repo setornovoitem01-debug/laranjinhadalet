@@ -31,14 +31,12 @@ function ObrigadoPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pixCode, setPixCode] = useState<string | null>(null);
-  const [pixQr, setPixQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [declined, setDeclined] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [loading2, setLoading2] = useState(false);
   const [error2, setError2] = useState<string | null>(null);
   const [pixCode2, setPixCode2] = useState<string | null>(null);
-  const [pixQr2, setPixQr2] = useState<string | null>(null);
   const [copied2, setCopied2] = useState(false);
   const [declined2, setDeclined2] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
