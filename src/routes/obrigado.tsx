@@ -109,7 +109,7 @@ function ObrigadoPage() {
       });
       setPixCode2(res.pixCopyPaste ?? null);
       setPixStartedAt2(Date.now());
-      setPixQr2(res.qrCodeBase64 ?? null);
+      
       if (res.id) setPaymentId(res.id);
     } catch (e) {
       setError2(e instanceof Error ? e.message : "Erro ao gerar PIX");
