@@ -82,6 +82,15 @@ function ObrigadoPage() {
     }, 350);
   }
 
+  function getTracking(): Record<string, string | null> {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(localStorage.getItem("__tracking") || "{}") as Record<string, string | null>;
+    } catch {
+      return {};
+    }
+  }
+
   async function handleUpsell() {
     setLoading(true);
     setError(null);
@@ -92,6 +101,8 @@ function ObrigadoPage() {
           description: "Chamada de vídeo 15min com Leticia",
           customerEmail: "cliente@privacy.com",
           customerName: "Cliente",
+          productId: "upsell-chamada-15min",
+          tracking: getTracking(),
         },
       });
       setPixCode(res.pixCopyPaste ?? null);
@@ -114,11 +125,12 @@ function ObrigadoPage() {
           description: "Chamada exclusiva 15min com Leticia + irmã",
           customerEmail: "cliente@privacy.com",
           customerName: "Cliente",
+          productId: "upsell-chamada-irma",
+          tracking: getTracking(),
         },
       });
       setPixCode2(res.pixCopyPaste ?? null);
       setPixStartedAt2(Date.now());
-      
       if (res.id) setPaymentId(res.id);
     } catch (e) {
       setError2(e instanceof Error ? e.message : "Erro ao gerar PIX");
@@ -126,6 +138,7 @@ function ObrigadoPage() {
       setLoading2(false);
     }
   }
+
 
 
   async function copyCode() {

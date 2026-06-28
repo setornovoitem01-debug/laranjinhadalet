@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS public.utmify_orders_payment_id_idx;

@@ -94,6 +94,15 @@ function Obrigado2Page() {
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 200);
   }
 
+  function getTracking(): Record<string, string | null> {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(localStorage.getItem("__tracking") || "{}") as Record<string, string | null>;
+    } catch {
+      return {};
+    }
+  }
+
   async function handleUpsell3() {
     setLoading(true);
     setError(null);
@@ -104,6 +113,8 @@ function Obrigado2Page() {
           description: "Atendimento presencial com Leticia",
           customerEmail: "cliente@privacy.com",
           customerName: "Cliente",
+          productId: "upsell-presencial",
+          tracking: getTracking(),
         },
       });
       setPixCode(res.pixCopyPaste ?? null);
