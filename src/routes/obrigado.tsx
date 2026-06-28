@@ -160,7 +160,7 @@ function ObrigadoPage() {
             <img
               src={profileAsset.url}
               alt="leticia"
-              className="w-44 h-44 rounded-full object-cover border-4 shadow-[0_8_30px_rgba(232,93,58,0.25)]"
+              className="w-44 h-44 rounded-full object-cover border-4 shadow-[0_8px_30px_rgba(232,93,58,0.25)]"
               style={{ borderColor: ACCENT }}
             />
             <div
