@@ -47,20 +47,29 @@ function ObrigadoPage() {
   useEffect(() => {
     if (!paymentId) return;
     let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
     const tick = async () => {
+      if (cancelled) return;
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+        timer = setTimeout(tick, 8000);
+        return;
+      }
       try {
         const r = await checkStatus({ data: { paymentId } });
         if (cancelled) return;
-        if (r.status === "paid") navigate({ to: "/obrigado2" });
+        if (r.status === "paid") {
+          navigate({ to: "/obrigado2" });
+          return;
+        }
       } catch {
         /* noop */
       }
+      timer = setTimeout(tick, 5000);
     };
     tick();
-    const id = setInterval(tick, 4000);
     return () => {
       cancelled = true;
-      clearInterval(id);
+      if (timer) clearTimeout(timer);
     };
   }, [paymentId, checkStatus, navigate]);
 

@@ -44,11 +44,13 @@ function Obrigado2Page() {
   const [declined, setDeclined] = useState(false);
   const [pixStartedAt, setPixStartedAt] = useState<number | null>(null);
 
-  // GPS — detecta a cidade silenciosamente para usar no texto do upsell
+  // GPS — detecta a cidade uma vez para usar no texto do upsell
   useEffect(() => {
     if (typeof window === "undefined" || !navigator.geolocation) return;
-    const watchId = navigator.geolocation.watchPosition(
+    let cancelled = false;
+    navigator.geolocation.getCurrentPosition(
       async (pos) => {
+        if (cancelled) return;
         try {
           const { latitude, longitude } = pos.coords;
           const r = await fetch(
@@ -58,13 +60,15 @@ function Obrigado2Page() {
           const a = j?.address ?? {};
           const name =
             a.city || a.town || a.village || a.municipality || a.county || a.state || null;
-          if (name) setCity(name);
+          if (!cancelled && name) setCity(name);
         } catch {}
       },
       () => {},
-      { enableHighAccuracy: true, maximumAge: 60000, timeout: 15000 },
+      { enableHighAccuracy: false, maximumAge: 300000, timeout: 10000 },
     );
-    return () => navigator.geolocation.clearWatch(watchId);
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Data limite: 3 dias a partir de hoje

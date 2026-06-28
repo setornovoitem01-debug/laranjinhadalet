@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS utmify_orders_payment_id_idx ON public.utmify_orders (payment_id);
