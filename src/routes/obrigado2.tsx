@@ -39,7 +39,7 @@ function Obrigado2Page() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pixCode, setPixCode] = useState<string | null>(null);
-  const [pixQr, setPixQr] = useState<string | null>(null);
+  
   const [copied, setCopied] = useState(false);
   const [declined, setDeclined] = useState(false);
   const [pixStartedAt, setPixStartedAt] = useState<number | null>(null);
