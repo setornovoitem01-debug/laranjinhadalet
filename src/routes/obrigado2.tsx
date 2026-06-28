@@ -39,7 +39,7 @@ function Obrigado2Page() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pixCode, setPixCode] = useState<string | null>(null);
-  const [pixQr, setPixQr] = useState<string | null>(null);
+  
   const [copied, setCopied] = useState(false);
   const [declined, setDeclined] = useState(false);
   const [pixStartedAt, setPixStartedAt] = useState<number | null>(null);
@@ -103,7 +103,6 @@ function Obrigado2Page() {
         },
       });
       setPixCode(res.pixCopyPaste ?? null);
-      setPixQr(res.qrCodeBase64 ?? null);
       setPixStartedAt(Date.now());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao gerar PIX");

@@ -67,7 +67,7 @@ function ProfilePage() {
   const [pixLoading, setPixLoading] = useState(false);
   const [pixError, setPixError] = useState<string | null>(null);
   const [pixCode, setPixCode] = useState<string | null>(null);
-  const [pixQr, setPixQr] = useState<string | null>(null);
+  
   const [copied, setCopied] = useState(false);
   const [paymentId, setPaymentId] = useState<string | null>(null);
 
@@ -138,7 +138,6 @@ function ProfilePage() {
   const exitCheckout = () => {
     setCheckoutMode(false);
     setPixCode(null);
-    setPixQr(null);
     setPixError(null);
     setBackOfferOpen(false);
     setBackOfferShown(false);
@@ -265,7 +264,6 @@ function ProfilePage() {
     setPixLoading(true);
     setPixError(null);
     setPixCode(null);
-    setPixQr(null);
     try {
       const amount = parsePrice(selectedPlan.price);
       const res = await createPix({
@@ -283,7 +281,6 @@ function ProfilePage() {
         setPixError(res.error || "Não foi possível gerar o Pix.");
       } else {
         setPixCode(res.pixCopyPaste);
-        setPixQr(res.qrCodeBase64 ?? null);
         if (res.id) setPaymentId(res.id);
       }
     } catch (e) {

@@ -31,14 +31,12 @@ function ObrigadoPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pixCode, setPixCode] = useState<string | null>(null);
-  const [pixQr, setPixQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [declined, setDeclined] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [loading2, setLoading2] = useState(false);
   const [error2, setError2] = useState<string | null>(null);
   const [pixCode2, setPixCode2] = useState<string | null>(null);
-  const [pixQr2, setPixQr2] = useState<string | null>(null);
   const [copied2, setCopied2] = useState(false);
   const [declined2, setDeclined2] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
@@ -89,7 +87,6 @@ function ObrigadoPage() {
       });
       setPixCode(res.pixCopyPaste ?? null);
       setPixStartedAt(Date.now());
-      setPixQr(res.qrCodeBase64 ?? null);
       if (res.id) setPaymentId(res.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
@@ -112,7 +109,7 @@ function ObrigadoPage() {
       });
       setPixCode2(res.pixCopyPaste ?? null);
       setPixStartedAt2(Date.now());
-      setPixQr2(res.qrCodeBase64 ?? null);
+      
       if (res.id) setPaymentId(res.id);
     } catch (e) {
       setError2(e instanceof Error ? e.message : "Erro ao gerar PIX");
@@ -160,7 +157,7 @@ function ObrigadoPage() {
             <img
               src={profileAsset.url}
               alt="leticia"
-              className="w-44 h-44 rounded-full object-cover border-4 shadow-[0_8_30px_rgba(232,93,58,0.25)]"
+              className="w-44 h-44 rounded-full object-cover border-4 shadow-[0_8px_30px_rgba(232,93,58,0.25)]"
               style={{ borderColor: ACCENT }}
             />
             <div
